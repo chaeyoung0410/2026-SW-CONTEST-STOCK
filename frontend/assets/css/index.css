@@ -1,0 +1,76 @@
+.index_wrap{
+    width: 1536px;
+    height: 1024px;
+    margin: 0 auto;
+
+    background-image: url(../img/Main_img.png);
+
+    position: relative;
+}
+
+.index_nav{
+    padding-top: 46px;
+    padding-left: 38px;
+    display: flex;
+    gap: 10px;
+}
+.index_n_1{
+    width: 83px;
+    height: 83px;
+}
+.index_n_2{
+    width: 83px;
+    height: 83px;
+}
+
+.index_main{
+    display: flex;
+}
+
+.index_m_box{
+    width: 454px;
+    height: 177px;
+    border-radius: 48px;
+    background: linear-gradient(to bottom, #743BD1, #422091);
+    border: 9px solid #D188F8;
+    margin-top: 370px;
+    margin-left: 90px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-weight: 600;
+    font-size: 43px;
+    color: white;
+}
+
+.index_book{
+    width: 144px;
+    height: 144px;
+    margin-top: 13px;
+}
+
+.index_char{
+    width: 341px;
+    height: 399px;
+    margin-top: 300px;
+    margin-left: -40px;
+}
+
+.index_footer{
+    width: 1412px;
+    height: 157px;
+    background-color: #1D1A43;
+    border: 2px solid #5A478C;
+    border-radius: 36px;
+    margin-top: 25px;
+    margin-left: 60px;
+
+    display: flex;
+    justify-content: center;
+    gap: 250px;
+    font-weight: 600;
+    font-size: 25px;
+    color: white;
+}
