@@ -25,23 +25,24 @@
 
 .index_main{
     display: flex;
+    margin-top: 80px;
 }
 
 .index_m_box{
-    width: 454px;
-    height: 177px;
+    width: 474px;
+    height: 197px;
     border-radius: 48px;
     background: linear-gradient(to bottom, #743BD1, #422091);
     border: 9px solid #D188F8;
-    margin-top: 370px;
-    margin-left: 90px;
+    margin-top: 330px;
+    margin-left: 100px;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
     font-weight: 600;
-    font-size: 43px;
+    font-size: 53px;
     color: white;
 }
 
@@ -49,28 +50,12 @@
     width: 144px;
     height: 144px;
     margin-top: 13px;
+    margin-left: -25px;
 }
 
 .index_char{
-    width: 341px;
-    height: 399px;
-    margin-top: 300px;
-    margin-left: -40px;
-}
-
-.index_footer{
-    width: 1412px;
-    height: 157px;
-    background-color: #1D1A43;
-    border: 2px solid #5A478C;
-    border-radius: 36px;
-    margin-top: 25px;
-    margin-left: 60px;
-
-    display: flex;
-    justify-content: center;
-    gap: 250px;
-    font-weight: 600;
-    font-size: 25px;
-    color: white;
+    width: 401px;
+    height: 459px;
+    margin-top: 260px;
+    margin-left: -25px;
 }
