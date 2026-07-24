@@ -76,34 +76,106 @@
 
                 <!-- 정답 화면 -->
                 <div class="correct_page" id="correctPage">
-                    <div class="result_character">
-                    </div>
-                    <h2 class="result_title">
+
+                    <!-- 리본 -->
+                    <div class="correct_ribbon">
                         정답!
-                    </h2>
-                    <p class="result_text" id="correctText">
-                        정답이에요!
-                    </p>
-                    <button class="result_btn" id="nextQuestionBtn">
-                        다음 문제
-                    </button>
+                    </div>
+
+                    <!-- 카드 -->
+                    <div class="correct_card">
+
+                        <div class="result_character">
+                            <img src="../assets/img/correct_character.png" alt="정답 캐릭터">
+                        </div>
+
+                        <h2 class="result_title" id="correctText">
+                            정답이에요!
+                        </h2>
+
+                        <p class="result_desc">
+                            회사의 소유권을 나타내는 증권입니다.
+                        </p>
+
+                        <!-- 성장도 -->
+                        <div class="upgrade_box">
+
+                            <div class="upgrade_header">
+                                <span>집 업그레이드</span>
+                                <span id="buildingProgressText">0 / 15</span>
+                            </div>
+
+                            <div class="upgrade_progress">
+                                <div class="upgrade_progress_bar" id="buildingProgressBar"></div>
+                            </div>
+
+                            <div class="building_preview">
+                                <img src="../assets/img/building_0.png">
+                                <span>→</span>
+                                <img src="../assets/img/building_6.png">
+                                <span>→</span>
+                                <img src="../assets/img/building_14.png">
+                            </div>
+
+                        </div>
+
+                        <button class="result_btn" id="nextQuestionBtn">
+                            다음 단계로
+                        </button>
+
+                    </div>
+
                 </div>
 
                 <!-- 오답 화면 -->
                 <div class="wrong_page" id="wrongPage">
-                    <div class="result_character">
-                    </div>
-                    <h2 class="wrong_title">
+
+                    <div class="wrong_ribbon">
                         아쉽게도 오답이에요!
-                    </h2>
-                    <div class="correct_answer">
-                        정답은
-                        <span id="correctAnswer"></span>
-                        입니다.
                     </div>
-                    <button class="wrong_btn" id="conceptBtn">
-                        개념 설명 보기
-                    </button>
+
+                    <div class="wrong_card">
+
+                        <div class="wrong_character">
+                            <img src="../assets/img/wrong_character.png">
+                        </div>
+
+                        <div class="selected_answer">
+                            <span>선택한 답 : <span class="wrong" id="selectedAnswer"></span></span>
+                            ❌
+                        </div>
+
+                        <div class="correct_answer_box">
+                            정답은 <span class="correct" id="correctAnswer"></span> 입니다.
+                        </div>
+
+                        <div class="upgrade_box">
+
+                            <div class="upgrade_header">
+                                <span>집 업그레이드</span>
+                                <span id="wrongBuildingProgressText">0 / 15</span>
+                            </div>
+
+                            <div class="upgrade_progress">
+                                <div class="upgrade_progress_bar" id="wrongBuildingProgressBar"></div>
+                            </div>
+
+                            <div class="building_preview">
+                                <img src="../assets/img/building_0.png">
+                                <span>→</span>
+                                <img src="../assets/img/building_6.png">
+                                <span>→</span>
+                                <img src="../assets/img/building_14.png">
+                            </div>
+
+                        </div>
+
+                        <button class="wrong_btn" id="conceptBtn">
+                            개념 설명 보기
+                        </button>
+
+                    </div>
+
                 </div>
 
                 <!-- 개념 설명 화면 -->
@@ -117,42 +189,32 @@
                             주식은 회사의 소유권을 나타내는 증권입니다.
                         </p>
                     </div>
-                    <!-- 개념 설명 화면 -->
-                    <div class="concept_page" id="conceptPage">
-                        <div class="concept_character"></div>
 
-                        <h2 class="concept_title">개념 설명</h2>
+                    <!-- 다시 도전 선택 영역 -->
+                    <div class="retry_box">
+                        <div class="retry_ribbon">다시 도전할까요?</div>
+                        <p class="retry_description">이번 문제를 다시 풀어보거나<br>다음 단계로 넘어갈 수 있어요.</p>
+                        <div class="retry_buttons">
+                            <button type="button" class="retry_btn" id="retryStageBtn">
+                                <span class="retry_icon">↻</span>
+                                <span>다시 풀기</span>
+                            </button>
 
-                        <div class="concept_box">
-                            <h3 id="conceptName">주식</h3>
-                            <p id="conceptDescription">주식은 회사의 소유권을 나타내는 증권입니다.</p>
-                        </div>
-
-                        <!-- 다시 도전 선택 영역 -->
-                        <div class="retry_box">
-                            <div class="retry_ribbon">다시 도전할까요?</div>
-                            <p class="retry_description">이번 문제를 다시 풀어보거나<br>다음 단계로 넘어갈 수 있어요.</p>
-                            <div class="retry_buttons">
-                                <button type="button" class="retry_btn" id="retryStageBtn">
-                                    <span class="retry_icon">↻</span>
-                                    <span>다시 풀기</span>
-                                </button>
-
-                                <button type="button" class="next_stage_btn" id="nextStageBtn">
-                                    <span class="next_icon">➜</span>
-                                    <span>다음 단계로</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="concept_tip">
-                            <span class="tip_icon">💡</span>
-                            <div class="tip_content">
-                                <strong>TIP</strong>
-                                <p>처음 틀려도 괜찮아요!<br>많이 풀수록 더 많이 배울 수 있어요.</p>
-                            </div>
+                            <button type="button" class="next_stage_btn" id="nextStageBtn">
+                                <span class="next_icon">➜</span>
+                                <span>다음 단계로</span>
+                            </button>
                         </div>
                     </div>
+
+                    <div class="concept_tip">
+                        <span class="tip_icon">💡</span>
+                        <div class="tip_content">
+                            <strong>TIP</strong>
+                            <p>처음 틀려도 괜찮아요!<br>많이 풀수록 더 많이 배울 수 있어요.</p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

@@ -14,6 +14,7 @@ const option4 = document.getElementById("option4");
 const options = [option1, option2, option3, option4];
 
 const progressBar = document.getElementById("progressBar");
+const quizHeader = document.querySelector(".quiz_header");
 
 const stages = document.querySelectorAll(".gameplay_stage");
 
@@ -27,6 +28,14 @@ const nextQuestionBtn = document.getElementById("nextQuestionBtn");
 const retryStageBtn = document.getElementById("retryStageBtn");
 const nextStageBtn = document.getElementById("nextStageBtn");
 const conceptBtn = document.getElementById("conceptBtn");
+
+const buildingProgressBar = document.getElementById("buildingProgressBar");
+const buildingProgressText = document.getElementById("buildingProgressText");
+const selectedAnswerText = document.getElementById("selectedAnswer");
+
+const wrongBuildingProgressBar = document.getElementById("wrongBuildingProgressBar");
+
+const wrongBuildingProgressText = document.getElementById("wrongBuildingProgressText");
 
 let currentStage = 1;
 let unlockedStage = 1;
@@ -274,7 +283,11 @@ const quizData = {
 };
 
 // 화면 전환 함수
+// 화면 전환 함수
 function showQuiz() {
+    // 문제 화면에서는 상단 진행바 보이기
+    quizHeader.style.display = "flex";
+
     quizPage.style.display = "block";
     correctPage.style.display = "none";
     wrongPage.style.display = "none";
@@ -282,6 +295,9 @@ function showQuiz() {
 }
 
 function showCorrect() {
+    // 정답 화면에서는 상단 진행바 숨기기
+    quizHeader.style.display = "none";
+
     quizPage.style.display = "none";
     correctPage.style.display = "block";
     wrongPage.style.display = "none";
@@ -289,6 +305,9 @@ function showCorrect() {
 }
 
 function showWrong() {
+    // 오답 화면에서도 상단 진행바 숨기기
+    quizHeader.style.display = "none";
+
     quizPage.style.display = "none";
     correctPage.style.display = "none";
     wrongPage.style.display = "block";
@@ -296,10 +315,13 @@ function showWrong() {
 }
 
 function showConcept() {
+    // 개념 설명 화면에서도 상단 진행바 숨기기
+    quizHeader.style.display = "none";
+
     quizPage.style.display = "none";
     correctPage.style.display = "none";
     wrongPage.style.display = "none";
-    conceptPage.style.display = "block";
+    conceptPage.style.display = "flex";
 }
 
 // 퀴즈 불러오기
@@ -330,7 +352,7 @@ function loadQuiz(stageNum) {
         quiz.conceptContent;
 
     progressBar.style.width =
-        `${(currentStage / 15) * 100}%`;
+        `${(currentStage / 14) * 100}%`;
 
     showQuiz();
 
@@ -340,12 +362,17 @@ function loadQuiz(stageNum) {
 options.forEach((button, index) => {
     button.addEventListener("click", () => {
         const quiz = quizData[currentStage][0];
-        const selectedAnswer = index + 1;
+        const selectedIndex = index + 1;
 
-        if (selectedAnswer === quiz.answer) {
+        // 사용자가 선택한 답 표시
+        selectedAnswerText.textContent = quiz.options[selectedIndex - 1];
+        if (selectedIndex === quiz.answer) {
+            updateCorrectProgress(currentStage);
             showCorrect();
         } else {
+            updateWrongProgress(currentStage);
             showWrong();
+
         }
     });
 });
@@ -401,7 +428,6 @@ stages.forEach(stage => {
 
 // 캐릭터 이동
 const player = document.getElementById("playerCharacter");
-
 const stagePosition = {
     start: { x: -10, y: 570 },
     1: { x: 330, y: 565 },
@@ -453,9 +479,24 @@ popup.addEventListener("click", (e) => {
 const building = document.getElementById("myBuilding");
 const buildingLevel = document.getElementById("buildingLevel");
 
-function updateBuilding(stage){
+function updateBuilding(stage) {
     building.src = `../assets/img/building_${stage}.png`;
     buildingLevel.textContent = `Lv.${stage}`;
 }
+
+function updateCorrectProgress(stage) {
+    buildingProgressBar.style.width = `${(stage / 14) * 100}%`;
+    buildingProgressText.textContent = `${stage} / 14`;
+}
+
 moveCharacter("start");
 updateBuilding(0);
+
+function updateWrongProgress(stage) {
+
+    wrongBuildingProgressBar.style.width =
+        `${(stage / 14) * 100}%`;
+
+    wrongBuildingProgressText.textContent =
+        `${stage} / 14`;
+}
