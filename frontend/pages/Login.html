@@ -1,14 +1,156 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Login</title>
+
     <link rel="stylesheet" href="../assets/css/Login.css">
 </head>
+
 <body>
-    <div class="Login_wrap">
-        
+
+    <div class="login_page">
+
+        <!-- 왼쪽 캐릭터 영역 -->
+        <div class="character_area">
+
+            <div class="speech_bubble">
+
+                <div class="speech_title">
+                    <div>✦</div>
+                    <div>어서오세요!</div>
+                    <div>✦</div>
+                </div>
+
+                <div class="speech_description">
+                    자수정가에서<br>
+                    주식 공부를 시작해보아요!
+                </div>
+
+            </div>
+
+            <img src="./assets/img/login-character.png" alt="자수정가 캐릭터" class="login_character">
+
+        </div>
+
+
+        <!-- 로그인 카드 -->
+        <div class="login_card">
+
+            <!-- 로그인 상단 -->
+            <div class="login_header">
+
+                <div class="logo_wrap">
+
+                    <img src="./assets/img/logo-icon.png" alt="자수정가 로고" class="logo_icon">
+
+                    <div class="logo_sparkle sparkle_left">✦</div>
+                    <div class="logo_sparkle sparkle_right">✦</div>
+
+                </div>
+
+                <div class="login_title">로그인</div>
+
+                <div class="login_description">
+                    자수정가 계정으로 로그인하고<br>
+                    나의 학습 여정을 이어가세요!
+                </div>
+
+            </div>
+
+
+            <!-- 로그인 입력 영역 -->
+            <div id="loginForm" class="login_form">
+
+                <!-- 아이디 -->
+                <div class="input_group">
+
+                    <div class="input_label">아이디</div>
+
+                    <div class="input_box">
+
+                        <div class="input_icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="12" cy="8" r="4"></circle>
+                                <path d="M5 21v-2a7 7 0 0 1 14 0v2"></path>
+                            </svg>
+                        </div>
+
+                        <input type="text" id="userId" name="userId" placeholder=" 입력해주세요" autocomplete="username">
+
+                    </div>
+
+                </div>
+
+
+                <!-- 비밀번호 -->
+                <div class="input_group">
+
+                    <div class="input_label">비밀번호</div>
+
+                    <div class="input_box" id="passwordInputBox">
+
+                        <div class="input_icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <rect x="5" y="10" width="14" height="11" rx="2"></rect>
+
+                                <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+                            </svg>
+                        </div>
+
+                        <input type="password" id="password" name="password" placeholder="비밀번호를 입력해주세요"
+                            autocomplete="current-password">
+
+                        <div id="passwordToggle" class="password_toggle" role="button" tabindex="0"
+                            aria-label="비밀번호 표시">
+
+                            <img id="passwordEye" src="../assets/img/eye_closed.svg" alt="비밀번호 표시">
+                        </div>
+
+                    </div>
+
+                    <div id="loginError" class="error_message">
+                        아이디 또는 비밀번호가 올바르지 않습니다.
+                    </div>
+
+                </div>
+
+
+                <!-- 로그인 버튼 -->
+                <div id="loginButton" class="login_button" role="button" tabindex="0">
+                    <div>로그인</div>
+                    <div>→</div>
+                </div>
+
+
+                <!-- 구분선 -->
+                <div class="divider">
+
+                    <div class="divider_line"></div>
+
+                    <div class="divider_text">또는</div>
+
+                    <div class="divider_line"></div>
+
+                </div>
+
+
+                <!-- 회원가입 버튼 -->
+                <div id="signupButton" class="signup_button" role="button" tabindex="0">
+                    <div>회원가입</div>
+                    <div>→</div>
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
+
+    <script src="../js/Login.js"></script>
 </body>
+
 </html>
