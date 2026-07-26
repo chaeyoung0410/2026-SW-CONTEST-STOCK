@@ -8,24 +8,8 @@
     position: relative;
 }
 
-.index_nav{
-    padding-top: 46px;
-    padding-left: 38px;
-    display: flex;
-    gap: 10px;
-}
-.index_n_1{
-    width: 83px;
-    height: 83px;
-}
-.index_n_2{
-    width: 83px;
-    height: 83px;
-}
-
 .index_main{
     display: flex;
-    margin-top: 80px;
 }
 
 .index_m_box{
@@ -34,7 +18,7 @@
     border-radius: 48px;
     background: linear-gradient(to bottom, #743BD1, #422091);
     border: 9px solid #D188F8;
-    margin-top: 330px;
+    margin-top: 550px;
     margin-left: 100px;
 
     display: flex;
@@ -56,6 +40,6 @@
 .index_char{
     width: 401px;
     height: 459px;
-    margin-top: 260px;
-    margin-left: -25px;
+    margin-top: 420px;
+    margin-left: 30px;
 }
