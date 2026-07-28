@@ -68,7 +68,6 @@ loginButton.addEventListener("click", async () => {
             // JWT 및 사용자 정보 저장
             localStorage.setItem("accessToken", data.access_token);
             localStorage.setItem("userId", data.user_id);
-            localStorage.setItem("nickname", data.nickname);
 
             // 게임 화면 이동
             window.location.href = "./Gameplay.html";

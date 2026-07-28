@@ -12,12 +12,8 @@ def get_user_by_email(db: Session, email: str) -> User | None:
     return db.scalar(select(User).where(User.email == email))
 
 
-def get_user_by_nickname(db: Session, nickname: str) -> User | None:
-    return db.scalar(select(User).where(User.nickname == nickname))
-
-
-def update_nickname(db: Session, user: User, nickname: str) -> User:
-    user.nickname = nickname
+def update_login_id(db: Session, user: User, login_id: str) -> User:
+    user.login_id = login_id
     db.flush()
     return user
 
@@ -28,13 +24,11 @@ def create_user(
     login_id: str,
     email: str,
     hashed_password: str,
-    nickname: str,
 ) -> User:
     user = User(
         login_id=login_id,
         email=email,
         password=hashed_password,
-        nickname=nickname,
     )
     db.add(user)
     db.flush()

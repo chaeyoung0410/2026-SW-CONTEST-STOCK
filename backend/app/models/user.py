@@ -13,7 +13,6 @@ class User(Base):
     login_id: Mapped[str] = mapped_column(String(30), unique=True, index=True, nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
-    nickname: Mapped[str] = mapped_column(String(30), unique=True, index=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(timezone.utc), nullable=False
     )

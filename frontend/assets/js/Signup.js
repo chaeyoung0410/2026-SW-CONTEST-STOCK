@@ -98,7 +98,6 @@ signupButton.addEventListener("click", async () => {
         if (loginResponse.ok) {
             localStorage.setItem("accessToken", loginData.access_token);
             localStorage.setItem("userId", loginData.user_id);
-            localStorage.setItem("nickname", loginData.nickname);
             window.location.href = "./Gameplay.html";
         } else {
             window.location.href = "./Login.html";

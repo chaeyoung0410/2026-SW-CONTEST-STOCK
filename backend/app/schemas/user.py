@@ -2,8 +2,8 @@ from pydantic import BaseModel, Field
 
 
 class UserResponse(BaseModel):
-    nickname: str
+    login_id: str
 
 
 class UserUpdateRequest(BaseModel):
-    nickname: str = Field(min_length=2, max_length=30)
+    login_id: str = Field(min_length=2, max_length=30)

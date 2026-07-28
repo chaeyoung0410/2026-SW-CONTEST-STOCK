@@ -27,7 +27,7 @@ async function loadProfile() {
     }
 
     const data = await response.json();
-    userId.textContent = data.nickname;
+    userId.textContent = data.login_id;
   } catch (error) {
     console.error(error);
   }
@@ -75,7 +75,7 @@ modalConfirmBtn.addEventListener('click', async () => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ nickname: value }),
+      body: JSON.stringify({ login_id: value }),
     });
 
     const data = await response.json();
@@ -85,8 +85,7 @@ modalConfirmBtn.addEventListener('click', async () => {
       return;
     }
 
-    localStorage.setItem('nickname', data.nickname);
-    userId.textContent = data.nickname;
+    userId.textContent = data.login_id;
     closeModal();
   } catch (error) {
     console.error(error);

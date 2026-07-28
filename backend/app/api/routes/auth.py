@@ -12,14 +12,14 @@ router = APIRouter(tags=["Authentication"])
 
 @router.post("/signup", response_model=SignUpResponse)
 def signup(request: SignUpRequest, db: Session = Depends(get_db)) -> SignUpResponse:
-    sign_up(db, request.login_id, request.email, request.password, request.nickname)
+    sign_up(db, request.login_id, request.email, request.password)
     return SignUpResponse(success=True)
 
 
 @router.post("/login", response_model=LoginResponse)
 def login_user(request: LoginRequest, db: Session = Depends(get_db)) -> LoginResponse:
     user, token = login(db, request.login_id, request.password)
-    return LoginResponse(success=True, user_id=user.user_id, nickname=user.nickname, access_token=token)
+    return LoginResponse(success=True, user_id=user.user_id, access_token=token)
 
 
 @router.get("/auth/status", response_model=AuthStatusResponse)
