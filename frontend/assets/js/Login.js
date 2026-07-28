@@ -2,6 +2,8 @@ const loginButton = document.getElementById("loginButton");
 const signupButton = document.getElementById("signupButton");
 
 const passwordInput = document.getElementById("password");
+const userIdInput = document.getElementById("userId");
+
 const passwordToggle = document.getElementById("passwordToggle");
 const passwordEye = document.getElementById("passwordEye");
 
@@ -86,4 +88,18 @@ loginButton.addEventListener("click", async () => {
 /* 회원가입 버튼 */
 signupButton.addEventListener("click", () => {
     window.location.href = "./Signup.html";
+});
+
+document.querySelectorAll(".input_box").forEach(box => {
+    box.addEventListener("click", (e) => {
+        const input = box.querySelector("input");
+
+        // 눈 아이콘을 눌렀을 때는 포커스만 유지
+        if (e.target.closest(".password_toggle")) {
+            input.focus();
+            return;
+        }
+
+        input.focus();
+    });
 });

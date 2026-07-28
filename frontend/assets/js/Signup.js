@@ -55,3 +55,17 @@ signupButton.addEventListener("click", () => {
 loginBackButton.addEventListener("click", () => {
     window.location.href = "./Login.html";
 });
+
+/* 입력창 전체 클릭 시 포커스 */
+document.querySelectorAll(".input_box").forEach(box => {
+    box.addEventListener("click", (e) => {
+
+        // 눈 아이콘 클릭은 제외
+        if (e.target.closest(".password_toggle")) return;
+
+        const input = box.querySelector("input");
+        if (input) {
+            input.focus();
+        }
+    });
+});
