@@ -45,7 +45,7 @@ const quizHeader = document.querySelector(".quiz_header");
 
 const stages = document.querySelectorAll(".gameplay_stage");
 
-const correctText = document.getElementById("correctText");
+const correctDesc = document.getElementById("correctDesc");
 const correctAnswer = document.getElementById("correctAnswer");
 
 const conceptName = document.getElementById("conceptName");
@@ -277,7 +277,7 @@ options.forEach((button, index) => {
 
             if (result.correct) {
                 correctCount += 1;
-                correctText.textContent = result.explanation;
+                correctDesc.textContent = result.explanation;
                 updateCorrectProgress();
                 showCorrect();
             } else {

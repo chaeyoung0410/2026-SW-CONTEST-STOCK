@@ -9,8 +9,6 @@ from app.models.stage import Stage
 from app.models.user import User
 from app.services.building_service import sync_building
 
-PASSING_ACCURACY_RATIO = 0.7
-
 
 def save_result(
     db: Session,
@@ -27,7 +25,8 @@ def save_result(
 
     resolved_correct_count = correct_count if correct_count is not None else min(total_question, score // 10)
     accuracy = round((resolved_correct_count / total_question) * 100, 2)
-    stage_clear = total_question > 0 and (resolved_correct_count / total_question) >= PASSING_ACCURACY_RATIO
+    # 정답/오답과 상관없이 스테이지를 끝까지 풀면 클리어로 처리 (다음 단계 진행 가능)
+    stage_clear = True
 
     result = Result(
         user_id=user_id,
