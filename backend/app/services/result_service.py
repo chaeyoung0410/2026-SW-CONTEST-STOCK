@@ -9,7 +9,7 @@ from app.models.stage import Stage
 from app.models.user import User
 from app.services.building_service import sync_building
 
-PASSING_CORRECT_COUNT = 7
+PASSING_ACCURACY_RATIO = 0.7
 
 
 def save_result(
@@ -27,7 +27,7 @@ def save_result(
 
     resolved_correct_count = correct_count if correct_count is not None else min(total_question, score // 10)
     accuracy = round((resolved_correct_count / total_question) * 100, 2)
-    stage_clear = resolved_correct_count >= PASSING_CORRECT_COUNT
+    stage_clear = total_question > 0 and (resolved_correct_count / total_question) >= PASSING_ACCURACY_RATIO
 
     result = Result(
         user_id=user_id,

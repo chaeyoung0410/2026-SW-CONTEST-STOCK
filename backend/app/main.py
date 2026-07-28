@@ -1,12 +1,14 @@
 from pathlib import Path
 
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import auth, building, history, learning, quiz, ranking, result, stage, user
 from app.db.init_db import init_db
+from app.db.seed_data import seed_if_empty
+from app.db.session import SessionLocal
 
 app = FastAPI(title="Project2026 Stock Quest API", version="0.1.0")
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -25,6 +27,11 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup() -> None:
     init_db()
+    db = SessionLocal()
+    try:
+        seed_if_empty(db)
+    finally:
+        db.close()
 
 
 app.include_router(auth.router)
@@ -38,26 +45,17 @@ app.include_router(ranking.router)
 app.include_router(history.router)
 
 app.mount("/assets", StaticFiles(directory=FRONTEND_DIR / "assets"), name="frontend-assets")
+app.mount("/pages", StaticFiles(directory=PAGES_DIR, html=True), name="frontend-pages")
 
 
 @app.get("/")
-def landing_page() -> FileResponse:
-    return FileResponse(PAGES_DIR / "index.html")
+def landing_page() -> RedirectResponse:
+    return RedirectResponse(url="/pages/index.html")
 
 
 @app.get("/login")
-def login_page() -> FileResponse:
-    return FileResponse(PAGES_DIR / "Login.html")
-
-
-@app.get("/index.html")
-def landing_file_page() -> FileResponse:
-    return FileResponse(PAGES_DIR / "index.html")
-
-
-@app.get("/login.html")
-def login_file_page() -> FileResponse:
-    return FileResponse(PAGES_DIR / "Login.html")
+def login_page() -> RedirectResponse:
+    return RedirectResponse(url="/pages/Login.html")
 
 
 @app.get("/health")
