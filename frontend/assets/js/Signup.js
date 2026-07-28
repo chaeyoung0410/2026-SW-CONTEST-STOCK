@@ -1,8 +1,6 @@
 const signupButton = document.getElementById("signupButton");
 const loginBackButton = document.getElementById("loginBackButton");
 const userIdInput = document.getElementById("userId");
-const nicknameInput = document.getElementById("nickname");
-const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const passwordConfirmInput = document.getElementById("passwordConfirm");
 const passwordToggle = document.getElementById("passwordToggle");
@@ -54,12 +52,10 @@ signupButton.addEventListener("click", async () => {
     signupError.style.display = "none";
 
     const login_id = userIdInput.value.trim();
-    const nickname = nicknameInput.value.trim();
-    const email = emailInput.value.trim();
     const password = passwordInput.value;
     const passwordConfirm = passwordConfirmInput.value;
 
-    if (!login_id || !nickname || !email || !password || !passwordConfirm) {
+    if (!login_id || !password || !passwordConfirm) {
         signupError.textContent = "모든 항목을 입력해주세요.";
         signupError.style.display = "block";
         return;
@@ -77,7 +73,7 @@ signupButton.addEventListener("click", async () => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ login_id, email, password, nickname }),
+            body: JSON.stringify({ login_id, password }),
         });
 
         const signupData = await signupResponse.json();

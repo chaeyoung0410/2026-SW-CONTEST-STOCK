@@ -16,9 +16,9 @@ class LoginResponse(BaseModel):
 
 class SignUpRequest(BaseModel):
     login_id: str = Field(min_length=2, max_length=30, examples=["user01"])
-    email: EmailStr = Field(examples=["user01@example.com"])
     password: str = Field(min_length=4, max_length=100, examples=["1234"])
-    nickname: str = Field(min_length=2, max_length=30, examples=["Stock"])
+    email: EmailStr | None = Field(default=None, examples=["user01@example.com"])
+    nickname: str | None = Field(default=None, min_length=2, max_length=30, examples=["Stock"])
 
 
 class SignUpResponse(BaseModel):
