@@ -5,6 +5,7 @@ class QuestionResponse(BaseModel):
     question_id: int
     question: str
     choices: list[str]
+    tag: str
 
 
 class AnswerRequest(BaseModel):
@@ -17,3 +18,4 @@ class AnswerResponse(BaseModel):
     correct: bool
     score: int
     explanation: str
+    correct_answer: str

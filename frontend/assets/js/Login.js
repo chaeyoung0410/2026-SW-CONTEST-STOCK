@@ -39,10 +39,10 @@ const loginError = document.getElementById("loginError");
 loginButton.addEventListener("click", async () => {
     loginError.style.display = "none";
 
-    const user_id = userIdInput.value.trim();
+    const login_id = userIdInput.value.trim();
     const password = passwordInput.value;
 
-    if (!user_id || !password) {
+    if (!login_id || !password) {
         loginError.textContent = "아이디와 비밀번호를 입력해주세요.";
         loginError.style.display = "block";
         return;
@@ -50,13 +50,13 @@ loginButton.addEventListener("click", async () => {
 
     try {
 
-        const response = await fetch("/auth/login", {
+        const response = await fetch("/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                user_id,
+                login_id,
                 password,
             }),
         });
@@ -65,14 +65,16 @@ loginButton.addEventListener("click", async () => {
 
         if (response.ok) {
 
-            // JWT 저장
+            // JWT 및 사용자 정보 저장
             localStorage.setItem("accessToken", data.access_token);
+            localStorage.setItem("userId", data.user_id);
+            localStorage.setItem("nickname", data.nickname);
 
             // 게임 화면 이동
             window.location.href = "./Gameplay.html";
 
         } else {
-            loginError.textContent = data.detail;
+            loginError.textContent = data.detail || "로그인에 실패했습니다.";
             loginError.style.display = "block";
         }
 

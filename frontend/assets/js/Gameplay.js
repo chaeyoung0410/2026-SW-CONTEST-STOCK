@@ -1,3 +1,30 @@
+const token = localStorage.getItem("accessToken");
+const userId = localStorage.getItem("userId");
+
+if (!token || !userId) {
+    window.location.href = "./Login.html";
+}
+
+async function apiFetch(path, options = {}) {
+    const response = await fetch(path, {
+        ...options,
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            ...(options.headers || {}),
+        },
+    });
+
+    if (response.status === 401) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("userId");
+        window.location.href = "./Login.html";
+        throw new Error("Unauthorized");
+    }
+
+    return response;
+}
+
 const popup = document.getElementById("quizPopup");
 
 const quizPage = document.getElementById("quizPage");
@@ -34,258 +61,26 @@ const buildingProgressText = document.getElementById("buildingProgressText");
 const selectedAnswerText = document.getElementById("selectedAnswer");
 
 const wrongBuildingProgressBar = document.getElementById("wrongBuildingProgressBar");
-
 const wrongBuildingProgressText = document.getElementById("wrongBuildingProgressText");
 
-let currentStage = 1;
-let unlockedStage = 1;
+const player = document.getElementById("playerCharacter");
+const building = document.getElementById("myBuilding");
+const buildingLevel = document.getElementById("buildingLevel");
 
-// 퀴즈 데이터 (임시)
-const quizData = {
+const TOTAL_STAGES = 14;
 
-    1: [
-        {
-            question: "Q. 다음 중 주식이란 무엇일까요?",
-            options: [
-                "회사의 소유권일까요 아닐까요 일까요 아닐까요 일까요 아닐까요",
-                "은행 예금",
-                "보험 상품",
-                "대출 상품"
-            ],
-            answer: 1,
-            explanation: "정답이에요!",
-            conceptTitle: "주식",
-            conceptContent:
-                "주식은 회사의 소유권을 나타내는 증권입니다."
-        },
-    ],
+let stagesInfo = [];
+let currentStageId = null;
+let currentStageTitle = "";
+let currentQuestions = [];
+let currentQuestionIndex = 0;
+let correctCount = 0;
+let stageScore = 0;
+let lastExplanation = "";
+let lastConceptTag = "";
 
-    2: [
-        {
-            question: "PER은 무엇을 의미할까요?",
-            options: [
-                "주가수익비율",
-                "배당금",
-                "이자율",
-                "환율"
-            ],
-            answer: 1,
-            explanation: "정답입니다!",
-            conceptTitle: "PER",
-            conceptContent:
-                "PER은 주가수익비율을 의미합니다."
-        }
-    ],
-
-    3: [
-        {
-            question: "PER은 무엇을 의미할까요?",
-            options: [
-                "주가수익비율",
-                "배당금",
-                "이자율",
-                "환율"
-            ],
-            answer: 1,
-            explanation: "정답입니다!",
-            conceptTitle: "PER",
-            conceptContent:
-                "PER은 주가수익비율을 의미합니다."
-        }
-    ],
-
-    4: [
-        {
-            question: "PER은 무엇을 의미할까요?",
-            options: [
-                "주가수익비율",
-                "배당금",
-                "이자율",
-                "환율"
-            ],
-            answer: 1,
-            explanation: "정답입니다!",
-            conceptTitle: "PER",
-            conceptContent:
-                "PER은 주가수익비율을 의미합니다."
-        }
-    ],
-
-    5: [
-        {
-            question: "PER은 무엇을 의미할까요?",
-            options: [
-                "주가수익비율",
-                "배당금",
-                "이자율",
-                "환율"
-            ],
-            answer: 1,
-            explanation: "정답입니다!",
-            conceptTitle: "PER",
-            conceptContent:
-                "PER은 주가수익비율을 의미합니다."
-        }
-    ],
-
-    6: [
-        {
-            question: "PER은 무엇을 의미할까요?",
-            options: [
-                "주가수익비율",
-                "배당금",
-                "이자율",
-                "환율"
-            ],
-            answer: 1,
-            explanation: "정답입니다!",
-            conceptTitle: "PER",
-            conceptContent:
-                "PER은 주가수익비율을 의미합니다."
-        }
-    ],
-
-    7: [
-        {
-            question: "PER은 무엇을 의미할까요?",
-            options: [
-                "주가수익비율",
-                "배당금",
-                "이자율",
-                "환율"
-            ],
-            answer: 1,
-            explanation: "정답입니다!",
-            conceptTitle: "PER",
-            conceptContent:
-                "PER은 주가수익비율을 의미합니다."
-        }
-    ],
-
-    8: [
-        {
-            question: "PER은 무엇을 의미할까요?",
-            options: [
-                "주가수익비율",
-                "배당금",
-                "이자율",
-                "환율"
-            ],
-            answer: 1,
-            explanation: "정답입니다!",
-            conceptTitle: "PER",
-            conceptContent:
-                "PER은 주가수익비율을 의미합니다."
-        }
-    ],
-
-    9: [
-        {
-            question: "PER은 무엇을 의미할까요?",
-            options: [
-                "주가수익비율",
-                "배당금",
-                "이자율",
-                "환율"
-            ],
-            answer: 1,
-            explanation: "정답입니다!",
-            conceptTitle: "PER",
-            conceptContent:
-                "PER은 주가수익비율을 의미합니다."
-        }
-    ],
-
-    10: [
-        {
-            question: "PER은 무엇을 의미할까요?",
-            options: [
-                "주가수익비율",
-                "배당금",
-                "이자율",
-                "환율"
-            ],
-            answer: 1,
-            explanation: "정답입니다!",
-            conceptTitle: "PER",
-            conceptContent:
-                "PER은 주가수익비율을 의미합니다."
-        }
-    ],
-
-    11: [
-        {
-            question: "PER은 무엇을 의미할까요?",
-            options: [
-                "주가수익비율",
-                "배당금",
-                "이자율",
-                "환율"
-            ],
-            answer: 1,
-            explanation: "정답입니다!",
-            conceptTitle: "PER",
-            conceptContent:
-                "PER은 주가수익비율을 의미합니다."
-        }
-    ],
-
-    12: [
-        {
-            question: "PER은 무엇을 의미할까요?",
-            options: [
-                "주가수익비율",
-                "배당금",
-                "이자율",
-                "환율"
-            ],
-            answer: 1,
-            explanation: "정답입니다!",
-            conceptTitle: "PER",
-            conceptContent:
-                "PER은 주가수익비율을 의미합니다."
-        }
-    ],
-
-    13: [
-        {
-            question: "PER은 무엇을 의미할까요?",
-            options: [
-                "주가수익비율",
-                "배당금",
-                "이자율",
-                "환율"
-            ],
-            answer: 1,
-            explanation: "정답입니다!",
-            conceptTitle: "PER",
-            conceptContent:
-                "PER은 주가수익비율을 의미합니다."
-        }
-    ],
-
-    14: [
-        {
-            question: "PER은 무엇을 의미할까요?",
-            options: [
-                "주가수익비율",
-                "배당금",
-                "이자율",
-                "환율"
-            ],
-            answer: 1,
-            explanation: "정답입니다!",
-            conceptTitle: "PER",
-            conceptContent:
-                "PER은 주가수익비율을 의미합니다."
-        }
-    ]
-};
-
-// 화면 전환 함수
 // 화면 전환 함수
 function showQuiz() {
-    // 문제 화면에서는 상단 진행바 보이기
     quizHeader.style.display = "flex";
 
     quizPage.style.display = "block";
@@ -295,7 +90,6 @@ function showQuiz() {
 }
 
 function showCorrect() {
-    // 정답 화면에서는 상단 진행바 숨기기
     quizHeader.style.display = "none";
 
     quizPage.style.display = "none";
@@ -305,7 +99,6 @@ function showCorrect() {
 }
 
 function showWrong() {
-    // 오답 화면에서도 상단 진행바 숨기기
     quizHeader.style.display = "none";
 
     quizPage.style.display = "none";
@@ -315,7 +108,6 @@ function showWrong() {
 }
 
 function showConcept() {
-    // 개념 설명 화면에서도 상단 진행바 숨기기
     quizHeader.style.display = "none";
 
     quizPage.style.display = "none";
@@ -324,110 +116,7 @@ function showConcept() {
     conceptPage.style.display = "flex";
 }
 
-// 퀴즈 불러오기
-function loadQuiz(stageNum) {
-    currentStage = stageNum;
-    const quiz = quizData[currentStage]?.[0];
-    if (!quiz) {
-        alert("아직 준비되지 않은 문제입니다.");
-        return;
-    }
-
-    quizQuestion.textContent = quiz.question;
-
-    option1.textContent = quiz.options[0];
-    option2.textContent = quiz.options[1];
-    option3.textContent = quiz.options[2];
-    option4.textContent = quiz.options[3];
-
-    correctText.textContent = quiz.explanation;
-
-    correctAnswer.textContent =
-        quiz.options[quiz.answer - 1];
-
-    conceptName.textContent =
-        quiz.conceptTitle;
-
-    conceptDescription.textContent =
-        quiz.conceptContent;
-
-    progressBar.style.width =
-        `${(currentStage / 14) * 100}%`;
-
-    showQuiz();
-
-}
-
-// 보기 클릭
-options.forEach((button, index) => {
-    button.addEventListener("click", () => {
-        const quiz = quizData[currentStage][0];
-        const selectedIndex = index + 1;
-
-        // 사용자가 선택한 답 표시
-        selectedAnswerText.textContent = quiz.options[selectedIndex - 1];
-        if (selectedIndex === quiz.answer) {
-            updateCorrectProgress(currentStage);
-            showCorrect();
-        } else {
-            updateWrongProgress(currentStage);
-            showWrong();
-
-        }
-    });
-});
-
-// 정답 화면 -> 다음 문제
-nextQuestionBtn.addEventListener("click", () => {
-    moveCharacter(currentStage);
-    updateBuilding(currentStage);
-    const nextStage = currentStage + 1;
-    unlockedStage = Math.max(unlockedStage, nextStage);
-
-    if (quizData[nextStage]) {
-        loadQuiz(nextStage);
-    } else {
-        popup.classList.remove("active");
-    }
-});
-
-// 오답 화면 -> 개념 설명
-conceptBtn.addEventListener("click", () => {
-    showConcept();
-});
-
-// 다시 풀기
-retryStageBtn.addEventListener("click", () => {
-    loadQuiz(currentStage);
-});
-
-// 다음 단계로
-nextStageBtn.addEventListener("click", () => {
-    moveCharacter(currentStage);
-    updateBuilding(currentStage);
-    const nextStage = currentStage + 1;
-    unlockedStage = Math.max(unlockedStage, nextStage);
-
-    if (quizData[nextStage]) {
-        loadQuiz(nextStage);
-    } else {
-        popup.classList.remove("active");
-    }
-});
-
-// 스테이지 클릭
-stages.forEach(stage => {
-    stage.addEventListener("click", () => {
-        const stageNum = Number(stage.dataset.stage);
-
-        if (stageNum > unlockedStage) return;
-        loadQuiz(stageNum);
-        popup.classList.add("active");
-    });
-});
-
 // 캐릭터 이동
-const player = document.getElementById("playerCharacter");
 const stagePosition = {
     start: { x: -10, y: 570 },
     1: { x: 330, y: 565 },
@@ -451,10 +140,8 @@ function moveCharacter(stage) {
 
     if (!player || !position) return;
 
-    // 기존 클래스 제거
     player.classList.remove("start", "stage");
 
-    // start와 스테이지 구분
     if (stage === "start") {
         player.classList.add("start");
     } else {
@@ -465,41 +152,243 @@ function moveCharacter(stage) {
     player.style.left = `${position.x}px`;
     player.style.top = `${position.y}px`;
 }
-moveCharacter("start");
 
+function setOptionsEnabled(enabled) {
+    options.forEach((btn) => {
+        btn.disabled = !enabled;
+    });
+}
+
+// 스테이지 잠금/클리어 상태 반영
+function renderStageLocks() {
+    stages.forEach((stageEl) => {
+        const stageNum = Number(stageEl.dataset.stage);
+        const info = stagesInfo.find((s) => s.stage_id === stageNum);
+
+        stageEl.classList.toggle("locked", Boolean(info && info.locked));
+        stageEl.classList.toggle("cleared", Boolean(info && info.cleared));
+    });
+}
+
+async function loadStages() {
+    try {
+        const response = await apiFetch("/stage");
+        if (!response.ok) return;
+
+        stagesInfo = await response.json();
+        renderStageLocks();
+
+        const clearedStageIds = stagesInfo.filter((s) => s.cleared).map((s) => s.stage_id);
+        const furthestCleared = clearedStageIds.length ? Math.max(...clearedStageIds) : 0;
+
+        moveCharacter(furthestCleared > 0 ? furthestCleared : "start");
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function loadBuilding() {
+    try {
+        const response = await apiFetch("/building");
+        if (!response.ok) return;
+
+        const data = await response.json();
+        building.src = `../assets/img/${data.image}`;
+        buildingLevel.textContent = `Lv.${data.level}`;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function startStage(stageId, stageTitle) {
+    try {
+        const response = await apiFetch(`/question/${stageId}`);
+
+        if (!response.ok) {
+            const data = await response.json().catch(() => ({}));
+            alert(data.detail || "문제를 불러올 수 없습니다.");
+            return;
+        }
+
+        const questions = await response.json();
+        if (!questions.length) {
+            alert("아직 준비되지 않은 문제입니다.");
+            return;
+        }
+
+        currentStageId = stageId;
+        currentStageTitle = stageTitle;
+        currentQuestions = questions;
+        currentQuestionIndex = 0;
+        correctCount = 0;
+        stageScore = 0;
+
+        popup.classList.add("active");
+        loadQuestion();
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+function loadQuestion() {
+    const question = currentQuestions[currentQuestionIndex];
+
+    quizQuestion.textContent = question.question;
+    options.forEach((btn, index) => {
+        btn.textContent = question.choices[index];
+    });
+    setOptionsEnabled(true);
+
+    progressBar.style.width = `${((currentQuestionIndex + 1) / currentQuestions.length) * 100}%`;
+
+    showQuiz();
+}
+
+// 보기 클릭
+options.forEach((button, index) => {
+    button.addEventListener("click", async () => {
+        const question = currentQuestions[currentQuestionIndex];
+        const selectedIndex = index + 1;
+
+        setOptionsEnabled(false);
+        selectedAnswerText.textContent = question.choices[index];
+
+        try {
+            const response = await apiFetch("/answer", {
+                method: "POST",
+                body: JSON.stringify({
+                    user_id: Number(userId),
+                    question_id: question.question_id,
+                    answer: selectedIndex,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                alert(result.detail || "답안 제출에 실패했습니다.");
+                setOptionsEnabled(true);
+                return;
+            }
+
+            stageScore += result.score;
+            lastExplanation = result.explanation;
+            lastConceptTag = question.tag;
+
+            if (result.correct) {
+                correctCount += 1;
+                correctText.textContent = result.explanation;
+                updateCorrectProgress();
+                showCorrect();
+            } else {
+                correctAnswer.textContent = result.correct_answer;
+                updateWrongProgress();
+                showWrong();
+            }
+        } catch (error) {
+            console.error(error);
+            setOptionsEnabled(true);
+        }
+    });
+});
+
+// 스테이지 내 다음 문제로, 마지막 문제면 결과 제출
+async function advance() {
+    if (currentQuestionIndex + 1 < currentQuestions.length) {
+        currentQuestionIndex += 1;
+        loadQuestion();
+        return;
+    }
+
+    try {
+        const response = await apiFetch("/result", {
+            method: "POST",
+            body: JSON.stringify({
+                user_id: Number(userId),
+                stage_id: currentStageId,
+                score: stageScore,
+                correct_count: correctCount,
+                total_question: currentQuestions.length,
+            }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            moveCharacter(currentStageId);
+            await loadBuilding();
+            await loadStages();
+
+            if (result.stage_clear && currentStageId >= TOTAL_STAGES) {
+                popup.classList.remove("active");
+                window.location.href = "./final.html";
+                return;
+            }
+        } else {
+            alert(result.detail || "결과 저장에 실패했습니다.");
+        }
+    } catch (error) {
+        console.error(error);
+    }
+
+    popup.classList.remove("active");
+}
+
+// 정답 화면 -> 다음 문제/결과 제출
+nextQuestionBtn.addEventListener("click", () => {
+    advance();
+});
+
+// 오답 화면 -> 개념 설명
+conceptBtn.addEventListener("click", () => {
+    conceptName.textContent = lastConceptTag || currentStageTitle;
+    conceptDescription.textContent = lastExplanation;
+    showConcept();
+});
+
+// 다시 풀기 (현재 스테이지 처음부터)
+retryStageBtn.addEventListener("click", () => {
+    currentQuestionIndex = 0;
+    correctCount = 0;
+    stageScore = 0;
+    loadQuestion();
+});
+
+// 다음 단계로 (다음 문제 또는 결과 제출)
+nextStageBtn.addEventListener("click", () => {
+    advance();
+});
+
+// 스테이지 클릭
+stages.forEach((stageEl) => {
+    stageEl.addEventListener("click", () => {
+        const stageNum = Number(stageEl.dataset.stage);
+        const info = stagesInfo.find((s) => s.stage_id === stageNum);
+
+        if (info && info.locked) {
+            alert("이전 단계를 먼저 클리어해주세요.");
+            return;
+        }
+
+        startStage(stageNum, info ? info.title : `Stage ${stageNum}`);
+    });
+});
+
+function updateCorrectProgress() {
+    buildingProgressBar.style.width = `${(currentStageId / TOTAL_STAGES) * 100}%`;
+    buildingProgressText.textContent = `${currentStageId} / ${TOTAL_STAGES}`;
+}
+
+function updateWrongProgress() {
+    wrongBuildingProgressBar.style.width = `${(currentStageId / TOTAL_STAGES) * 100}%`;
+    wrongBuildingProgressText.textContent = `${currentStageId} / ${TOTAL_STAGES}`;
+}
 
 popup.addEventListener("click", (e) => {
-
     if (e.target === popup) {
         popup.classList.remove("active");
     }
 });
-
-//
-const building = document.getElementById("myBuilding");
-const buildingLevel = document.getElementById("buildingLevel");
-
-function updateBuilding(stage) {
-    building.src = `../assets/img/building_${stage}.png`;
-    buildingLevel.textContent = `Lv.${stage}`;
-}
-
-function updateCorrectProgress(stage) {
-    buildingProgressBar.style.width = `${(stage / 14) * 100}%`;
-    buildingProgressText.textContent = `${stage} / 14`;
-}
-
-moveCharacter("start");
-updateBuilding(0);
-
-function updateWrongProgress(stage) {
-
-    wrongBuildingProgressBar.style.width =
-        `${(stage / 14) * 100}%`;
-
-    wrongBuildingProgressText.textContent =
-        `${stage} / 14`;
-}
 
 // 하단 네비게이션
 document.querySelector('[data-nav="home"]').addEventListener("click", () => {
@@ -513,3 +402,7 @@ document.querySelector('[data-nav="mypage"]').addEventListener("click", () => {
 document.querySelector('[data-nav="ai-recommend"]').addEventListener("click", () => {
     window.location.href = "./ai.html";
 });
+
+moveCharacter("start");
+loadStages();
+loadBuilding();

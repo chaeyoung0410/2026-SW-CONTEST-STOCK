@@ -49,6 +49,7 @@ def save_result(
 
     db.add(result)
     db.add(history)
+    db.flush()
     level, _ = sync_building(db, user_id)
     db.commit()
 

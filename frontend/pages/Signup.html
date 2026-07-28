@@ -43,6 +43,28 @@
                     <div id="userIdMessage" class="input_message"></div>
                 </div>
 
+                <!-- 닉네임 -->
+                <div class="input_group">
+                    <div class="input_label">닉네임</div>
+                    <div class="input_box" id="nicknameInputBox">
+                        <img src="../assets/img/id_icon.png" alt="" class="input_icon">
+
+                        <input type="text" id="nickname" name="nickname" placeholder="닉네임을 입력해주세요" autocomplete="nickname">
+                    </div>
+                    <div id="nicknameMessage" class="input_message"></div>
+                </div>
+
+                <!-- 이메일 -->
+                <div class="input_group">
+                    <div class="input_label">이메일</div>
+                    <div class="input_box" id="emailInputBox">
+                        <img src="../assets/img/id_icon.png" alt="" class="input_icon">
+
+                        <input type="email" id="email" name="email" placeholder="이메일을 입력해주세요" autocomplete="email">
+                    </div>
+                    <div id="emailMessage" class="input_message"></div>
+                </div>
+
 
                 <!-- 비밀번호 -->
                 <div class="input_group">
@@ -88,6 +110,7 @@
                     <div id="passwordConfirmError" class="error_message"></div>
                 </div>
 
+                <div id="signupError" class="error_message"></div>
 
                 <!-- 하단 버튼 -->
                 <div class="button_area">
@@ -109,7 +132,7 @@
 
     </div>
 
-    <script src="../js/Signup.js"></script>
+    <script src="../assets/js/Signup.js"></script>
 
 </body>
 

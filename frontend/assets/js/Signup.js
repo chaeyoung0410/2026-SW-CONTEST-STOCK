@@ -1,11 +1,15 @@
 const signupButton = document.getElementById("signupButton");
 const loginBackButton = document.getElementById("loginBackButton");
+const userIdInput = document.getElementById("userId");
+const nicknameInput = document.getElementById("nickname");
+const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const passwordConfirmInput = document.getElementById("passwordConfirm");
 const passwordToggle = document.getElementById("passwordToggle");
 const passwordConfirmToggle = document.getElementById("passwordConfirmToggle");
 const passwordEye = document.getElementById("passwordEye");
 const passwordConfirmEye = document.getElementById("passwordConfirmEye");
+const signupError = document.getElementById("signupError");
 
 
 /* 비밀번호 보기/숨기기 */
@@ -46,8 +50,69 @@ function togglePassword(input, eye, toggleButton) {
 
 
 /* 가입하기 버튼 */
-signupButton.addEventListener("click", () => {
-    window.location.href = "./Login.html";
+signupButton.addEventListener("click", async () => {
+    signupError.style.display = "none";
+
+    const login_id = userIdInput.value.trim();
+    const nickname = nicknameInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    const passwordConfirm = passwordConfirmInput.value;
+
+    if (!login_id || !nickname || !email || !password || !passwordConfirm) {
+        signupError.textContent = "모든 항목을 입력해주세요.";
+        signupError.style.display = "block";
+        return;
+    }
+
+    if (password !== passwordConfirm) {
+        signupError.textContent = "비밀번호가 일치하지 않습니다.";
+        signupError.style.display = "block";
+        return;
+    }
+
+    try {
+        const signupResponse = await fetch("/signup", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ login_id, email, password, nickname }),
+        });
+
+        const signupData = await signupResponse.json();
+
+        if (!signupResponse.ok) {
+            signupError.textContent = signupData.detail || "회원가입에 실패했습니다.";
+            signupError.style.display = "block";
+            return;
+        }
+
+        // 가입 성공 시 바로 로그인 처리 후 게임 화면으로 이동
+        const loginResponse = await fetch("/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ login_id, password }),
+        });
+
+        const loginData = await loginResponse.json();
+
+        if (loginResponse.ok) {
+            localStorage.setItem("accessToken", loginData.access_token);
+            localStorage.setItem("userId", loginData.user_id);
+            localStorage.setItem("nickname", loginData.nickname);
+            window.location.href = "./Gameplay.html";
+        } else {
+            window.location.href = "./Login.html";
+        }
+
+    } catch (error) {
+        console.error(error);
+        signupError.textContent = "서버와 연결할 수 없습니다.";
+        signupError.style.display = "block";
+    }
 });
 
 

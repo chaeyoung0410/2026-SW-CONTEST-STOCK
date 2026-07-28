@@ -30,6 +30,22 @@ def get_current_user(
     return user
 
 
+def get_optional_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    db: Session = Depends(get_db),
+) -> User | None:
+    if credentials is None:
+        return None
+
+    try:
+        payload = jwt.decode(credentials.credentials, settings.secret_key, algorithms=[settings.algorithm])
+        user_id = int(payload["sub"])
+    except (JWTError, KeyError, ValueError):
+        return None
+
+    return db.get(User, user_id)
+
+
 def ensure_same_user(request_user_id: int, current_user: User) -> None:
     if request_user_id != current_user.user_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User ID does not match token")

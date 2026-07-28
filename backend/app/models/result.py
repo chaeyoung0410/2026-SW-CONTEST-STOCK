@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -15,7 +15,9 @@ class Result(Base):
     score: Mapped[int] = mapped_column(Integer, nullable=False)
     correct_count: Mapped[int] = mapped_column(Integer, nullable=False)
     total_question: Mapped[int] = mapped_column(Integer, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc), nullable=False
+    )
 
     user = relationship("User", back_populates="results")
     stage = relationship("Stage", back_populates="results")

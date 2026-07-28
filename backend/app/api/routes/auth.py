@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user
+from app.api.deps import get_optional_current_user
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.auth import AuthStatusResponse, LoginRequest, LoginResponse, SignUpRequest, SignUpResponse
@@ -23,5 +23,5 @@ def login_user(request: LoginRequest, db: Session = Depends(get_db)) -> LoginRes
 
 
 @router.get("/auth/status", response_model=AuthStatusResponse)
-def auth_status(current_user: User = Depends(get_current_user)) -> AuthStatusResponse:
+def auth_status(current_user: User | None = Depends(get_optional_current_user)) -> AuthStatusResponse:
     return AuthStatusResponse(logged_in=current_user is not None)

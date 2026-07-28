@@ -18,6 +18,15 @@
     cursor: pointer;
 }
 
+.gameplay_stage.locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.gameplay_stage.cleared {
+    color: #ffd54f;
+}
+
 .gameplay_stages {
     position: relative;
 }

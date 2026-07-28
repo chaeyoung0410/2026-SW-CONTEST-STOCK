@@ -6,7 +6,35 @@ const modalConfirmBtn = document.getElementById('modalConfirmBtn');
 const newIdInput = document.getElementById('newIdInput');
 const charCount = document.getElementById('charCount');
 const userId = document.getElementById('userId');
- 
+
+// 로그인한 사용자 정보 불러오기
+async function loadProfile() {
+  const token = localStorage.getItem('accessToken');
+  if (!token) {
+    window.location.href = './Login.html';
+    return;
+  }
+
+  try {
+    const response = await fetch('/user', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      localStorage.removeItem('accessToken');
+      window.location.href = './Login.html';
+      return;
+    }
+
+    const data = await response.json();
+    userId.textContent = data.nickname;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+loadProfile();
+
 function openModal() {
   editIdModal.classList.add('is-open');
   newIdInput.value = '';
@@ -31,14 +59,39 @@ newIdInput.addEventListener('input', () => {
   charCount.textContent = `${newIdInput.value.length} / 16`;
 });
  
-modalConfirmBtn.addEventListener('click', () => {
+modalConfirmBtn.addEventListener('click', async () => {
   const value = newIdInput.value.trim();
-  if (value.length < 4) {
-    alert('아이디는 4자 이상 입력해주세요.');
+  if (value.length < 2) {
+    alert('아이디는 2자 이상 입력해주세요.');
     return;
   }
-  userId.textContent = value; 
-  closeModal();
+
+  const token = localStorage.getItem('accessToken');
+
+  try {
+    const response = await fetch('/user', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ nickname: value }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.detail || '아이디 변경에 실패했습니다.');
+      return;
+    }
+
+    localStorage.setItem('nickname', data.nickname);
+    userId.textContent = data.nickname;
+    closeModal();
+  } catch (error) {
+    console.error(error);
+    alert('서버와 연결할 수 없습니다.');
+  }
 });
  
 //뒤로가기

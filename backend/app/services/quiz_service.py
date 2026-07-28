@@ -14,9 +14,13 @@ def get_questions(db: Session, stage_id: int, user_id: int | None = None) -> lis
             "question_id": question.question_id,
             "question": question.question,
             "choices": [question.choice1, question.choice2, question.choice3, question.choice4],
+            "tag": question.tag,
         }
         for question in questions
     ]
+
+
+CHOICE_FIELDS = {1: "choice1", 2: "choice2", 3: "choice3", 4: "choice4"}
 
 
 def submit_answer(db: Session, question_id: int, answer: int) -> dict:
@@ -29,4 +33,5 @@ def submit_answer(db: Session, question_id: int, answer: int) -> dict:
         "correct": correct,
         "score": 10 if correct else 0,
         "explanation": question.explanation,
+        "correct_answer": getattr(question, CHOICE_FIELDS[question.answer]),
     }

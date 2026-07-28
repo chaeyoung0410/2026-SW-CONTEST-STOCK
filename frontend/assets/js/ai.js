@@ -9,5 +9,5 @@ document.querySelector('[data-nav="mypage"]').addEventListener('click', () => {
 });
 
 document.querySelector('[data-nav="home"]').addEventListener('click', () => {
-  window.location.href = 'frontend/pages/Gameplay.html'; // 실제 주소로 바꾸기
+  window.location.href = './Gameplay.html';
 });

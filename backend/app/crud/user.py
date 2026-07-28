@@ -16,6 +16,12 @@ def get_user_by_nickname(db: Session, nickname: str) -> User | None:
     return db.scalar(select(User).where(User.nickname == nickname))
 
 
+def update_nickname(db: Session, user: User, nickname: str) -> User:
+    user.nickname = nickname
+    db.flush()
+    return user
+
+
 def create_user(
     db: Session,
     *,

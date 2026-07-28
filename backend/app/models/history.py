@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, Float, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -14,7 +14,9 @@ class History(Base):
     stage_id: Mapped[int] = mapped_column(ForeignKey("stage.stage_id"), nullable=False)
     score: Mapped[int] = mapped_column(Integer, nullable=False)
     accuracy: Mapped[float] = mapped_column(Float, nullable=False)
-    play_time: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    play_time: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc), nullable=False
+    )
 
     user = relationship("User", back_populates="histories")
     stage = relationship("Stage", back_populates="histories")

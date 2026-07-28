@@ -4,14 +4,7 @@ from sqlalchemy.orm import Session
 from app.models.building import Building
 from app.models.progress import Progress
 
-BUILDING_IMAGES = {
-    0: "building0.png",
-    1: "building1_house.png",
-    2: "building2_cafe.png",
-    3: "building3_office.png",
-    4: "building4_company.png",
-    5: "building5_financial_tower.png",
-}
+BUILDING_IMAGES = {level: f"building_{level}.png" for level in range(15)}
 
 
 def get_building_level(db: Session, user_id: int) -> int:
