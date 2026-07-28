@@ -500,3 +500,16 @@ function updateWrongProgress(stage) {
     wrongBuildingProgressText.textContent =
         `${stage} / 14`;
 }
+
+// 하단 네비게이션
+document.querySelector('[data-nav="home"]').addEventListener("click", () => {
+    window.location.href = "./Gameplay.html";
+});
+
+document.querySelector('[data-nav="mypage"]').addEventListener("click", () => {
+    window.location.href = "./mypage.html";
+});
+
+document.querySelector('[data-nav="ai-recommend"]').addEventListener("click", () => {
+    window.location.href = "./ai.html";
+});

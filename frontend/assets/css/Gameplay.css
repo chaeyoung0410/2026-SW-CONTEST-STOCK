@@ -916,3 +916,85 @@
     color: #666;
     font-size: 18px;
 }
+
+/* 하단 바 */
+.bottom-nav {
+    position: absolute;
+    left: 0;
+    bottom: 18px;
+    width: 100%;
+    height: 12%;
+}
+
+.nav-item {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+
+    border: none;
+    background: none;
+    cursor: pointer;
+
+    color: #b9b6da;
+    font-size: 15px;
+    font-weight: 600;
+    transition: color .2s;
+}
+
+.nav-item img {
+    width: 55px;
+    height: 55px;
+}
+
+.nav-item[data-nav="home"] {
+    left: 16.67%;
+}
+
+.nav-item[data-nav="ai-recommend"] {
+    left: 50%;
+}
+
+.nav-item[data-nav="mypage"] {
+    left: 83.33%;
+}
+
+.nav-item:hover {
+    color: #fff;
+}
+
+.nav-item--active {
+    left: 50%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    width: 190px;
+    height: 115px;
+    gap: 8px;
+    border-radius: 24px;
+    background: linear-gradient(180deg,
+            #6b4de8 0%,
+            #4b2fae 100%);
+
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(75, 47, 174, .45);
+    white-space: nowrap;
+}
+
+.nav-item--active img {
+    width: 60px;
+    height: 60px;
+}
+
+.nav-item--active:hover {
+    filter: brightness(1.08);
+}
