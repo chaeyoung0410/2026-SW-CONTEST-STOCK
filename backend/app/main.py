@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import auth, building, history, learning, quiz, result, stage, user
 from app.db.init_db import init_db
-from app.db.seed_data import seed_if_empty
+from app.db.seed_data import seed_default_user, seed_if_empty
 from app.db.session import SessionLocal
 
 app = FastAPI(title="Project2026 Stock Quest API", version="0.1.0")
@@ -30,6 +30,7 @@ def on_startup() -> None:
     db = SessionLocal()
     try:
         seed_if_empty(db)
+        seed_default_user(db)
     finally:
         db.close()
 

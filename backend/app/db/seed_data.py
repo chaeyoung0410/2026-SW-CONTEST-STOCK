@@ -1,7 +1,13 @@
 from sqlalchemy.orm import Session
 
+from app.core.security import hash_password
 from app.models.question import Question
 from app.models.stage import Stage
+from app.models.user import User
+from app.services.building_service import ensure_building
+
+DEFAULT_USER_LOGIN_ID = "kim"
+DEFAULT_USER_PASSWORD = "123456"
 
 STAGES = [
     {
@@ -190,4 +196,15 @@ def seed_if_empty(db: Session) -> None:
             )
         )
 
+    db.commit()
+
+
+def seed_default_user(db: Session) -> None:
+    if db.query(User).filter(User.login_id == DEFAULT_USER_LOGIN_ID).first() is not None:
+        return
+
+    user = User(login_id=DEFAULT_USER_LOGIN_ID, password=hash_password(DEFAULT_USER_PASSWORD))
+    db.add(user)
+    db.flush()
+    ensure_building(db, user.user_id)
     db.commit()
