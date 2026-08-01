@@ -1,24 +1,19 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.crud.user import create_user, get_user_by_email, get_user_by_login_id
+from app.crud.user import create_user, get_user_by_login_id
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models.user import User
 from app.services.building_service import ensure_building
 
 
-def sign_up(db: Session, login_id: str, email: str | None, password: str) -> User:
+def sign_up(db: Session, login_id: str, password: str) -> User:
     if get_user_by_login_id(db, login_id) is not None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Login ID already exists")
-
-    resolved_email = email if email is not None else f"{login_id}@stockquest.local"
-    if get_user_by_email(db, resolved_email) is not None:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already exists")
 
     user = create_user(
         db,
         login_id=login_id,
-        email=resolved_email,
         hashed_password=hash_password(password),
     )
     ensure_building(db, user.user_id)

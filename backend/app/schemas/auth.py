@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 
 
 class LoginRequest(BaseModel):
@@ -16,7 +16,6 @@ class LoginResponse(BaseModel):
 class SignUpRequest(BaseModel):
     login_id: str = Field(min_length=2, max_length=30, examples=["user01"])
     password: str = Field(min_length=4, max_length=100, examples=["1234"])
-    email: EmailStr | None = Field(default=None, examples=["user01@example.com"])
 
 
 class SignUpResponse(BaseModel):

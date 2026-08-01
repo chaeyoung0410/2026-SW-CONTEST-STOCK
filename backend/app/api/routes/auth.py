@@ -12,7 +12,7 @@ router = APIRouter(tags=["Authentication"])
 
 @router.post("/signup", response_model=SignUpResponse)
 def signup(request: SignUpRequest, db: Session = Depends(get_db)) -> SignUpResponse:
-    sign_up(db, request.login_id, request.email, request.password)
+    sign_up(db, request.login_id, request.password)
     return SignUpResponse(success=True)
 
 
