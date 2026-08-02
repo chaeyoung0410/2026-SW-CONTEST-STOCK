@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from app.crud.user import create_user, get_user_by_login_id
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models.user import User
-from app.services.building_service import ensure_building
 
 
 def sign_up(db: Session, login_id: str, password: str) -> User:
@@ -16,7 +15,6 @@ def sign_up(db: Session, login_id: str, password: str) -> User:
         login_id=login_id,
         hashed_password=hash_password(password),
     )
-    ensure_building(db, user.user_id)
     db.commit()
     db.refresh(user)
     return user
