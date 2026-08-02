@@ -17,6 +17,5 @@ class User(Base):
     )
 
     progress = relationship("Progress", back_populates="user")
-    building = relationship("Building", back_populates="user", uselist=False)
     results = relationship("Result", back_populates="user")
     histories = relationship("History", back_populates="user")

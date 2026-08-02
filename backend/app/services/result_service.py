@@ -7,7 +7,7 @@ from app.models.progress import Progress
 from app.models.result import Result
 from app.models.stage import Stage
 from app.models.user import User
-from app.services.building_service import sync_building
+from app.services.building_service import get_building_state
 
 
 def save_result(
@@ -49,7 +49,7 @@ def save_result(
     db.add(result)
     db.add(history)
     db.flush()
-    level, _ = sync_building(db, user_id)
+    level, _ = get_building_state(db, user_id)
     db.commit()
 
     return {"stage_clear": stage_clear, "building_level": level}

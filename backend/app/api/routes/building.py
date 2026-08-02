@@ -5,7 +5,7 @@ from app.api.deps import get_current_user
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.building import BuildingResponse
-from app.services.building_service import sync_building
+from app.services.building_service import get_building_state
 
 router = APIRouter(tags=["Building"])
 
@@ -15,6 +15,5 @@ def get_building(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> BuildingResponse:
-    level, image = sync_building(db, current_user.user_id)
-    db.commit()
+    level, image = get_building_state(db, current_user.user_id)
     return BuildingResponse(level=level, image=image)

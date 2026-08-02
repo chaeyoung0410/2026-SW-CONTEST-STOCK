@@ -1,5 +1,4 @@
 from app.db.session import Base
-from app.models.building import Building
 from app.models.history import History
 from app.models.learning import Learning
 from app.models.progress import Progress
@@ -7,10 +6,10 @@ from app.models.question import Question
 from app.models.result import Result
 from app.models.stage import Stage
 from app.models.user import User
+from app.models.wrong_answer import WrongAnswer
 
 __all__ = [
     "Base",
-    "Building",
     "History",
     "Learning",
     "Progress",
@@ -18,4 +17,5 @@ __all__ = [
     "Result",
     "Stage",
     "User",
+    "WrongAnswer",
 ]
