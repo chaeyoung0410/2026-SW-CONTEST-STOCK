@@ -98,9 +98,9 @@ signupButton.addEventListener("click", async () => {
         if (loginResponse.ok) {
             localStorage.setItem("accessToken", loginData.access_token);
             localStorage.setItem("userId", loginData.user_id);
-            window.location.href = "./Gameplay.html";
+            smoothNavigate("./Gameplay.html");
         } else {
-            window.location.href = "./Login.html";
+            smoothNavigate("./Login.html");
         }
 
     } catch (error) {
@@ -113,7 +113,7 @@ signupButton.addEventListener("click", async () => {
 
 /* 로그인으로 돌아가기 버튼 */
 loginBackButton.addEventListener("click", () => {
-    window.location.href = "./Login.html";
+    smoothNavigate("./Login.html");
 });
 
 /* 입력창 전체 클릭 시 포커스 */
