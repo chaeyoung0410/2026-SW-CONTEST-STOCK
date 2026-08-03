@@ -70,7 +70,7 @@ loginButton.addEventListener("click", async () => {
             localStorage.setItem("userId", data.user_id);
 
             // 게임 화면 이동
-            window.location.href = "./Gameplay.html";
+            smoothNavigate("./Gameplay.html");
 
         } else {
             loginError.textContent = data.detail || "로그인에 실패했습니다.";
@@ -88,7 +88,7 @@ loginButton.addEventListener("click", async () => {
 
 /* 회원가입 버튼 */
 signupButton.addEventListener("click", () => {
-    window.location.href = "./Signup.html";
+    smoothNavigate("./Signup.html");
 });
 
 document.querySelectorAll(".input_box").forEach(box => {
