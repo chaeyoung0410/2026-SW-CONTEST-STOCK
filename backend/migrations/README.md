@@ -8,6 +8,8 @@
 ```bash
 cd backend
 sqlite3 local.db < migrations/001_ai_recommendation_sqlite.sql
+sqlite3 local.db < migrations/002_result_integrity_sqlite.sql
+sqlite3 local.db < migrations/003_recommendation_statistics_sqlite.sql
 ```
 
 ## MySQL
@@ -15,8 +17,10 @@ sqlite3 local.db < migrations/001_ai_recommendation_sqlite.sql
 ```bash
 cd backend
 mysql -u USER -p DB_NAME < migrations/001_ai_recommendation_mysql.sql
+mysql -u USER -p DB_NAME < migrations/002_result_integrity_mysql.sql
+mysql -u USER -p DB_NAME < migrations/003_recommendation_statistics_mysql.sql
 ```
 
-두 마이그레이션은 기존 `wrong_answer`를 삭제하지 않습니다. 추천 집계는 새
-`answer_attempt`가 있는 stage에서는 이를 우선 사용하고, 없는 stage에 한해 기존
-`result`, `wrong_answer` 순서로 읽어 중복 합산을 방지합니다.
+마이그레이션은 기존 `wrong_answer`, `result`, `history`를 삭제하지 않습니다.
+`002`부터 새 결과와 문제별 답안을 연결하고, 연결되지 않은 기존 `result`도 추천
+통계에 합산해 배포 전 학습 기록을 보존합니다.

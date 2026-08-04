@@ -40,6 +40,7 @@ def submit_answer(
     question = db.get(Question, question_id)
     if question is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Question not found")
+    ensure_stage_access(db, question.stage_id, user_id)
 
     if submission_id is not None:
         existing = db.scalar(
@@ -50,10 +51,10 @@ def submit_answer(
         )
         if existing is not None:
             # 같은 키를 다른 문제에 재사용하는 것은 잘못된 요청으로 차단한다.
-            if existing.question_id != question_id:
+            if existing.question_id != question_id or existing.selected_answer != answer:
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
-                    detail="submission_id was already used for another question",
+                    detail="submission_id was already used for a different answer",
                 )
             return _answer_payload(question, existing.correct, existing.attempt_id)
 
@@ -80,7 +81,12 @@ def submit_answer(
                     AnswerAttempt.submission_id == submission_id,
                 )
             )
-            if existing is not None and existing.question_id == question_id:
+            if existing is not None:
+                if existing.question_id != question_id or existing.selected_answer != answer:
+                    raise HTTPException(
+                        status_code=status.HTTP_409_CONFLICT,
+                        detail="submission_id was already used for a different answer",
+                    )
                 return _answer_payload(question, existing.correct, existing.attempt_id)
         raise
     except Exception:

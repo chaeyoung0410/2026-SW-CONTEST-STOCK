@@ -28,6 +28,9 @@ class AnswerAttempt(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.user_id"), nullable=False)
     question_id: Mapped[int | None] = mapped_column(ForeignKey("question.question_id"), nullable=True)
     stage_id: Mapped[int] = mapped_column(ForeignKey("stage.stage_id"), nullable=False)
+    result_id: Mapped[int | None] = mapped_column(
+        ForeignKey("result.result_id"), nullable=True, index=True
+    )
     selected_answer: Mapped[int | None] = mapped_column(Integer, nullable=True)
     correct: Mapped[bool] = mapped_column(Boolean, nullable=False)
     submission_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
@@ -38,3 +41,4 @@ class AnswerAttempt(Base):
     user = relationship("User", back_populates="answer_attempts")
     question = relationship("Question")
     stage = relationship("Stage", back_populates="answer_attempts")
+    result = relationship("Result", back_populates="answer_attempts")

@@ -8,10 +8,15 @@ from app.schemas.learning import (
     LearningResponse,
     RecommendationFeedbackRequest,
     RecommendationFeedbackResponse,
+    RecommendationInteractionResponse,
     RecommendationResponse,
 )
 from app.services.learning_service import get_learning
-from app.services.recommend_service import get_recommendations, update_recommendation_feedback
+from app.services.recommend_service import (
+    get_recommendations,
+    record_recommendation_interaction,
+    update_recommendation_feedback,
+)
 
 router = APIRouter(tags=["Learning"])
 
@@ -45,9 +50,74 @@ def update_recommendation(
     return {
         "recommendation_id": history.recommendation_id,
         "clicked": history.clicked,
+        "clicked_at": history.clicked_at,
+        "learning_started": history.learning_started,
+        "started_at": history.started_at,
         "learning_completed": history.learning_completed,
         "completed_at": history.completed_at,
     }
+
+
+def _record_interaction(
+    interaction: str,
+    recommendation_id: int,
+    db: Session,
+    current_user: User,
+) -> dict:
+    result = record_recommendation_interaction(
+        db,
+        current_user.user_id,
+        recommendation_id,
+        interaction,
+    )
+    history = result.history
+    return {
+        "recommendation_id": history.recommendation_id,
+        "interaction": result.interaction,
+        "already_applied": result.already_applied,
+        "clicked": history.clicked,
+        "clicked_at": history.clicked_at,
+        "learning_started": history.learning_started,
+        "started_at": history.started_at,
+        "learning_completed": history.learning_completed,
+        "completed_at": history.completed_at,
+    }
+
+
+@router.post(
+    "/learning/recommendations/{recommendation_id}/click",
+    response_model=RecommendationInteractionResponse,
+)
+def click_recommendation(
+    recommendation_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    return _record_interaction("click", recommendation_id, db, current_user)
+
+
+@router.post(
+    "/learning/recommendations/{recommendation_id}/start",
+    response_model=RecommendationInteractionResponse,
+)
+def start_recommendation(
+    recommendation_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    return _record_interaction("start", recommendation_id, db, current_user)
+
+
+@router.post(
+    "/learning/recommendations/{recommendation_id}/complete",
+    response_model=RecommendationInteractionResponse,
+)
+def complete_recommendation(
+    recommendation_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    return _record_interaction("complete", recommendation_id, db, current_user)
 
 
 @router.get("/learning/{stage_id}", response_model=LearningResponse)

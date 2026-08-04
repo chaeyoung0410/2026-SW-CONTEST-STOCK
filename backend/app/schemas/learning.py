@@ -47,5 +47,13 @@ class RecommendationFeedbackRequest(BaseModel):
 class RecommendationFeedbackResponse(BaseModel):
     recommendation_id: int
     clicked: bool
+    clicked_at: datetime | None
+    learning_started: bool
+    started_at: datetime | None
     learning_completed: bool
     completed_at: datetime | None
+
+
+class RecommendationInteractionResponse(RecommendationFeedbackResponse):
+    interaction: str
+    already_applied: bool

@@ -59,6 +59,31 @@
 
 다른 사용자의 추천 이력은 수정할 수 없습니다.
 
+새 프론트는 상태별 POST API를 사용합니다. 기존 PATCH는 호환용으로 유지됩니다.
+
+```text
+POST /learning/recommendations/{recommendation_id}/click
+POST /learning/recommendations/{recommendation_id}/start
+POST /learning/recommendations/{recommendation_id}/complete
+```
+
+```json
+{
+  "recommendation_id": 31,
+  "interaction": "complete",
+  "already_applied": false,
+  "clicked": true,
+  "clicked_at": "2026-08-04T10:00:00Z",
+  "learning_started": true,
+  "started_at": "2026-08-04T10:05:00Z",
+  "learning_completed": true,
+  "completed_at": "2026-08-04T10:30:00Z"
+}
+```
+
+같은 완료 요청을 다시 보내면 최초 `completed_at`을 유지하고
+`already_applied=true`를 반환합니다.
+
 ## 답안 제출의 중복 방지
 
 기존 `POST /answer` 요청은 그대로 지원하며 `submission_id`가 선택 필드로 추가됐습니다.
@@ -74,6 +99,74 @@
 
 같은 사용자가 동일한 `submission_id`를 재전송하면 새로운 풀이 기록을 만들지 않고 최초
 결과를 반환합니다. 동일 키를 다른 문제에 사용하면 `409 Conflict`를 반환합니다.
+
+## 퀴즈 결과 확정과 추천 완료
+
+기존 `POST /result` 필드는 그대로 지원하며, 새 프론트는 다음 선택 필드를 함께 보냅니다.
+
+```json
+{
+  "user_id": 1,
+  "stage_id": 2,
+  "score": 10,
+  "correct_count": 1,
+  "total_question": 1,
+  "answer_attempt_ids": [42],
+  "submission_id": "d921c9d0-4162-4c1b-b20c-f12ea7ca629f",
+  "recommendation_id": 31
+}
+```
+
+- `answer_attempt_ids`가 있으면 서버 저장 답안으로 점수와 정답 수를 대조합니다.
+- `submission_id` 재전송은 기존 결과를 반환하고 `result/history`를 중복 생성하지 않습니다.
+- `recommendation_id`가 있으면 결과 저장과 같은 트랜잭션에서 추천 학습을 완료 처리합니다.
+- 잠긴 단계, 실제 문제 수와 다른 `total_question`, 조작된 점수는 거부합니다.
+
+## 사용자 학습 통계
+
+`GET /users/me/statistics`
+
+완료된 퀴즈 `result`를 기준으로 전체·최근 30일·단계별 통계를 계산합니다. 추천
+효과는 추천 생성 당시 스냅샷과 추천에 연결된 결과를 비교합니다. 후속 결과가 없으면
+효과 상태는 `pending`이고 후속 값과 변화량은 `null`입니다.
+
+```json
+{
+  "total_attempts": 10,
+  "correct_count": 7,
+  "wrong_count": 3,
+  "overall_accuracy": 70.0,
+  "recent_accuracy": 80.0,
+  "cumulative_score": 70,
+  "recent_score_change": 10,
+  "stages": [],
+  "weakest_topic": {
+    "stage_id": 2,
+    "topic": "주식 주문 유형",
+    "accuracy": 40.0,
+    "wrong_count": 3,
+    "accuracy_change": null
+  },
+  "most_improved_topic": null,
+  "recommendations": {
+    "recommended_count": 4,
+    "clicked_count": 2,
+    "started_count": 2,
+    "completed_count": 1
+  },
+  "recommendation_effectiveness": {
+    "completed_content_count": 1,
+    "evaluated_count": 0,
+    "pending_count": 1,
+    "average_accuracy_change": null,
+    "improved_recommendation_rate": null,
+    "effects": []
+  }
+}
+```
+
+운영 품질 지표는 `statistics_service.calculate_recommendation_quality_metrics()`에서
+계산하지만 관리자 권한 체계가 없어 공개 라우터는 추가하지 않았습니다.
 
 ## 추천 점수
 

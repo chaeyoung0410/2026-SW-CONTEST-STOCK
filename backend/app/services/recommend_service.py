@@ -34,6 +34,13 @@ class TopicStats:
         return round((self.correct_count / self.total_attempts) * 100, 2)
 
 
+@dataclass(frozen=True)
+class RecommendationInteractionResult:
+    history: RecommendationHistory
+    interaction: str
+    already_applied: bool
+
+
 def get_recommendations(
     db: Session,
     user_id: int,
@@ -58,6 +65,10 @@ def get_recommendations(
     learning_by_stage = _get_learning_by_stage(db, candidates)
     topics = _get_topics(db, candidates)
     history_by_stage, last_top_stage_id = _get_recent_history(db, user_id)
+    latest_result_by_stage = _get_latest_results_by_stage(db, user_id)
+    is_default_recommendation = not any(
+        item.total_attempts > 0 for item in stats.values()
+    )
 
     ranked: list[dict] = []
     for stage in candidates:
@@ -105,6 +116,17 @@ def get_recommendations(
         )
 
     ranked.sort(key=lambda item: (-item["score"], item["stage"].stage_id))
+    # A penalty alone cannot guarantee rotation when one topic is much weaker.
+    # Keep the previous top eligible, but place one alternative ahead whenever
+    # at least two accessible candidates exist.
+    if (
+        len(ranked) > 1
+        and last_top_stage_id is not None
+        and ranked[0]["stage"].stage_id == last_top_stage_id
+    ):
+        previous_top = ranked.pop(0)
+        previous_top["score"] = round(max(0.0, ranked[0]["score"] - 0.01), 2)
+        ranked.insert(1, previous_top)
     selected = ranked[:limit]
 
     try:
@@ -114,6 +136,18 @@ def get_recommendations(
             pages = item["pages"]
             stage_stats = item["stats"]
             learning_id = pages[0].learning_id if pages else None
+            baseline_result = latest_result_by_stage.get(stage.stage_id)
+            baseline_total = baseline_result.total_question if baseline_result else 0
+            baseline_correct = (
+                min(max(baseline_result.correct_count, 0), baseline_total)
+                if baseline_result and baseline_total > 0
+                else 0
+            )
+            baseline_accuracy = (
+                round((baseline_correct / baseline_total) * 100, 2)
+                if baseline_total > 0
+                else None
+            )
             history = RecommendationHistory(
                 user_id=user_id,
                 stage_id=stage.stage_id,
@@ -122,6 +156,14 @@ def get_recommendations(
                 recommendation_score=item["score"],
                 reason=item["reason"],
                 recommended_at=now,
+                baseline_accuracy=baseline_accuracy,
+                baseline_score=(baseline_result.score if baseline_result else None),
+                baseline_wrong_count=(
+                    baseline_total - baseline_correct
+                    if baseline_total > 0
+                    else None
+                ),
+                is_default_recommendation=is_default_recommendation,
             )
             db.add(history)
             db.flush()
@@ -160,19 +202,22 @@ def update_recommendation_feedback(
     learning_completed: bool | None,
     now: datetime | None = None,
 ) -> RecommendationHistory:
-    history = db.get(RecommendationHistory, recommendation_id)
-    if history is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recommendation not found")
-    if history.user_id != user_id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Recommendation access denied")
+    history = _get_owned_recommendation(db, user_id, recommendation_id)
+    updated_at = _as_utc(now or datetime.now(timezone.utc))
 
-    if clicked is not None:
+    if clicked is not None and not (history.learning_completed and not clicked):
         history.clicked = clicked
-    if learning_completed is not None:
-        history.learning_completed = learning_completed
-        history.completed_at = _as_utc(now or datetime.now(timezone.utc)) if learning_completed else None
-        if learning_completed:
+        history.clicked_at = updated_at if clicked else None
+    if learning_completed:
+        if not history.learning_completed:
+            history.learning_completed = True
+            history.completed_at = updated_at
+        if not history.learning_started:
+            history.learning_started = True
+            history.started_at = updated_at
+        if not history.clicked:
             history.clicked = True
+            history.clicked_at = updated_at
 
     try:
         db.commit()
@@ -181,6 +226,72 @@ def update_recommendation_feedback(
     except Exception:
         db.rollback()
         raise
+
+
+def record_recommendation_interaction(
+    db: Session,
+    user_id: int,
+    recommendation_id: int,
+    interaction: str,
+    now: datetime | None = None,
+) -> RecommendationInteractionResult:
+    if interaction not in {"click", "start", "complete"}:
+        raise ValueError("Unsupported recommendation interaction")
+    history = _get_owned_recommendation(db, user_id, recommendation_id)
+    updated_at = _as_utc(now or datetime.now(timezone.utc))
+    already_applied = {
+        "click": history.clicked,
+        "start": history.learning_started,
+        "complete": history.learning_completed,
+    }[interaction]
+
+    if not already_applied:
+        if not history.clicked:
+            history.clicked = True
+            history.clicked_at = updated_at
+        if interaction in {"start", "complete"} and not history.learning_started:
+            history.learning_started = True
+            history.started_at = updated_at
+        if interaction == "complete" and not history.learning_completed:
+            history.learning_completed = True
+            history.completed_at = updated_at
+
+    try:
+        db.commit()
+        db.refresh(history)
+    except Exception:
+        db.rollback()
+        raise
+    return RecommendationInteractionResult(
+        history=history,
+        interaction=interaction,
+        already_applied=already_applied,
+    )
+
+
+def _get_owned_recommendation(
+    db: Session, user_id: int, recommendation_id: int
+) -> RecommendationHistory:
+    history = db.get(RecommendationHistory, recommendation_id)
+    if history is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "code": "RECOMMENDATION_NOT_FOUND",
+                "message": "추천 기록을 찾을 수 없습니다.",
+                "details": {"recommendation_id": recommendation_id},
+            },
+        )
+    if history.user_id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "code": "RECOMMENDATION_ACCESS_DENIED",
+                "message": "다른 사용자의 추천 기록은 수정할 수 없습니다.",
+                "details": {"recommendation_id": recommendation_id},
+            },
+        )
+    return history
 
 
 def _collect_topic_stats(db: Session, user_id: int) -> dict[int, TopicStats]:
@@ -193,10 +304,13 @@ def _collect_topic_stats(db: Session, user_id: int) -> dict[int, TopicStats]:
             .order_by(AnswerAttempt.created_at)
         )
     )
+    result_ids_covered_by_attempts: set[int] = set()
     stages_with_attempts: set[int] = set()
     for attempt in attempts:
         item = stats.setdefault(attempt.stage_id, TopicStats())
         stages_with_attempts.add(attempt.stage_id)
+        if attempt.result_id is not None:
+            result_ids_covered_by_attempts.add(attempt.result_id)
         item.total_attempts += 1
         if attempt.correct:
             item.correct_count += 1
@@ -207,7 +321,10 @@ def _collect_topic_stats(db: Session, user_id: int) -> dict[int, TopicStats]:
     results = list(db.scalars(select(Result).where(Result.user_id == user_id)))
     stages_with_results: set[int] = set()
     for result in results:
-        if result.stage_id in stages_with_attempts:
+        # New results are linked to their per-question AnswerAttempt rows. Only
+        # legacy/unlinked results are added, preserving old history without
+        # double-counting newly finalized quizzes.
+        if result.result_id in result_ids_covered_by_attempts:
             continue
         stages_with_results.add(result.stage_id)
         item = stats.setdefault(result.stage_id, TopicStats())
@@ -218,11 +335,12 @@ def _collect_topic_stats(db: Session, user_id: int) -> dict[int, TopicStats]:
 
     legacy_wrong_answers = list(db.scalars(select(WrongAnswer).where(WrongAnswer.user_id == user_id)))
     for wrong in legacy_wrong_answers:
-        if wrong.stage_id in stages_with_attempts:
-            continue
         item = stats.setdefault(wrong.stage_id, TopicStats())
         item.last_wrong_at = _latest(item.last_wrong_at, wrong.created_at)
-        if wrong.stage_id not in stages_with_results:
+        if (
+            wrong.stage_id not in stages_with_results
+            and wrong.stage_id not in stages_with_attempts
+        ):
             item.total_attempts += 1
             item.wrong_count += 1
     return stats
@@ -258,6 +376,20 @@ def _get_learning_by_stage(db: Session, stages: list[Stage]) -> dict[int, list[L
     for page in pages:
         grouped.setdefault(page.stage_id, []).append(page)
     return grouped
+
+
+def _get_latest_results_by_stage(db: Session, user_id: int) -> dict[int, Result]:
+    rows = list(
+        db.scalars(
+            select(Result)
+            .where(Result.user_id == user_id)
+            .order_by(Result.created_at.desc(), Result.result_id.desc())
+        )
+    )
+    latest: dict[int, Result] = {}
+    for result in rows:
+        latest.setdefault(result.stage_id, result)
+    return latest
 
 
 def _get_topics(db: Session, stages: list[Stage]) -> dict[int, str]:

@@ -2,6 +2,7 @@ import unittest
 from datetime import datetime, timezone
 
 from pydantic import ValidationError
+from fastapi import HTTPException
 from sqlalchemy import create_engine, func, select
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
@@ -9,9 +10,11 @@ from sqlalchemy.pool import StaticPool
 from app.core.security import hash_password
 from app.db.base import Base
 from app.models.answer_attempt import AnswerAttempt
+from app.models.history import History
 from app.models.progress import Progress
 from app.models.question import Question
 from app.models.recommendation_history import RecommendationHistory
+from app.models.result import Result
 from app.models.stage import Stage
 from app.models.user import User
 from app.schemas.result import ResultRequest
@@ -19,6 +22,7 @@ from app.services.auth_service import login
 from app.services.quiz_service import submit_answer
 from app.services.recommend_service import get_recommendations, update_recommendation_feedback
 from app.services.recommendation_scoring import RecommendationSignals, calculate_recommendation_score
+from app.services.result_service import save_result
 
 
 class RecommendationTestCase(unittest.TestCase):
@@ -135,6 +139,82 @@ class RecommendationTestCase(unittest.TestCase):
         self.assertEqual(first["attempt_id"], second["attempt_id"])
         attempt_count = self.db.scalar(select(func.count()).select_from(AnswerAttempt))
         self.assertEqual(attempt_count, 1)
+
+    def test_locked_stage_answer_and_result_are_rejected(self) -> None:
+        with self.assertRaises(HTTPException) as answer_error:
+            submit_answer(self.db, self.user.user_id, 2, 1, "locked-stage-answer")
+        self.assertEqual(answer_error.exception.status_code, 403)
+
+        with self.assertRaises(HTTPException) as result_error:
+            save_result(self.db, self.user.user_id, 2, 10, 1, 1)
+        self.assertEqual(result_error.exception.status_code, 403)
+
+    def test_result_is_server_verified_idempotent_and_completes_recommendation(self) -> None:
+        recommendation = get_recommendations(self.db, self.user.user_id)[0]
+        answer = submit_answer(
+            self.db,
+            self.user.user_id,
+            1,
+            1,
+            "verified-answer-submission",
+        )
+        request = {
+            "user_id": self.user.user_id,
+            "stage_id": 1,
+            "score": 10,
+            "correct_count": 1,
+            "total_question": 1,
+            "answer_attempt_ids": [answer["attempt_id"]],
+            "submission_id": "verified-result-submission",
+            "recommendation_id": recommendation["recommendation_id"],
+        }
+
+        first = save_result(self.db, **request)
+        second = save_result(self.db, **request)
+
+        self.assertEqual(first, second)
+        self.assertEqual(self.db.scalar(select(func.count()).select_from(Result)), 1)
+        self.assertEqual(self.db.scalar(select(func.count()).select_from(History)), 1)
+        attempt = self.db.get(AnswerAttempt, answer["attempt_id"])
+        history = self.db.get(
+            RecommendationHistory, recommendation["recommendation_id"]
+        )
+        self.assertIsNotNone(attempt.result_id)
+        self.assertTrue(history.learning_completed)
+        self.assertIsNotNone(history.completed_at)
+
+    def test_tampered_score_is_rejected(self) -> None:
+        with self.assertRaises(HTTPException) as error:
+            save_result(self.db, self.user.user_id, 1, 20, 1, 1)
+        self.assertEqual(error.exception.status_code, 422)
+
+    def test_legacy_result_and_new_unfinalized_attempt_are_both_counted(self) -> None:
+        self.db.add(
+            Result(
+                user_id=self.user.user_id,
+                stage_id=1,
+                score=0,
+                correct_count=0,
+                total_question=1,
+            )
+        )
+        self.db.add(
+            AnswerAttempt(
+                user_id=self.user.user_id,
+                question_id=1,
+                stage_id=1,
+                selected_answer=1,
+                correct=True,
+                submission_id="new-unfinalized-answer",
+            )
+        )
+        self.db.commit()
+
+        item = get_recommendations(self.db, self.user.user_id)[0]
+
+        self.assertEqual(item["total_attempts"], 2)
+        self.assertEqual(item["correct_count"], 1)
+        self.assertEqual(item["wrong_count"], 1)
 
     def test_recommendation_click_and_completion_are_recorded(self) -> None:
         item = get_recommendations(self.db, self.user.user_id)[0]

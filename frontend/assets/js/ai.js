@@ -104,9 +104,8 @@ async function startRecommendation(container) {
 
     if (recommendationId) {
         try {
-            await apiFetch(`/learning/recommendations/${recommendationId}`, {
-                method: "PATCH",
-                body: JSON.stringify({ clicked: true }),
+            await apiFetch(`/learning/recommendations/${recommendationId}/click`, {
+                method: "POST",
             });
         } catch (error) {
             // 클릭 이력 저장 실패가 학습 시작 자체를 막지는 않는다.
@@ -115,6 +114,9 @@ async function startRecommendation(container) {
     }
 
     sessionStorage.setItem("recommendedStageId", String(stageId));
+    if (recommendationId) {
+        sessionStorage.setItem("recommendedRecommendationId", String(recommendationId));
+    }
     smoothNavigate("./Gameplay.html");
 }
 
