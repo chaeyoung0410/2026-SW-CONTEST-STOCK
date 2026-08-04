@@ -6,6 +6,7 @@ const modalConfirmBtn = document.getElementById('modalConfirmBtn');
 const newIdInput = document.getElementById('newIdInput');
 const charCount = document.getElementById('charCount');
 const userId = document.getElementById('userId');
+const API_BASE = "http://127.0.0.1:8000";
 
 // 로그인한 사용자 정보 불러오기
 async function loadProfile() {
@@ -16,7 +17,7 @@ async function loadProfile() {
   }
 
   try {
-    const response = await fetch('/user', {
+    const response = await fetch(`${API_BASE}/user`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -42,24 +43,24 @@ function openModal() {
   charCount.textContent = '0 / 16';
   newIdInput.focus();
 }
- 
+
 function closeModal() {
   editIdModal.classList.remove('is-open');
 }
- 
+
 editIdBtn.addEventListener('click', openModal);
 modalCloseBtn.addEventListener('click', closeModal);
 modalCancelBtn.addEventListener('click', closeModal);
- 
+
 // 오버레이 바깥(어두운 영역) 클릭 시 닫기
 editIdModal.addEventListener('click', (e) => {
   if (e.target === editIdModal) closeModal();
 });
- 
+
 newIdInput.addEventListener('input', () => {
   charCount.textContent = `${newIdInput.value.length} / 16`;
 });
- 
+
 modalConfirmBtn.addEventListener('click', async () => {
   const value = newIdInput.value.trim();
   if (value.length < 2) {
@@ -70,7 +71,7 @@ modalConfirmBtn.addEventListener('click', async () => {
   const token = localStorage.getItem('accessToken');
 
   try {
-    const response = await fetch('/user', {
+    const response = await fetch(`${API_BASE}/user`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -93,7 +94,7 @@ modalConfirmBtn.addEventListener('click', async () => {
     alert('서버와 연결할 수 없습니다.');
   }
 });
- 
+
 //뒤로가기
 document.querySelector('.back-btn').addEventListener('click', () => {
   smoothBack();
@@ -104,5 +105,6 @@ const logoutBtn = document.getElementById('logoutBtn');
 
 logoutBtn.addEventListener('click', () => {
   localStorage.removeItem('accessToken');
+  localStorage.removeItem('userId');
   smoothNavigate('./Login.html');
 });

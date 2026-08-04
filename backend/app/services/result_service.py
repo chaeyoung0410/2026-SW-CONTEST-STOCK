@@ -49,7 +49,8 @@ def save_result(
     db.add(result)
     db.add(history)
     db.flush()
-    level, _ = get_building_state(db, user_id)
+    building_state = get_building_state(db, user_id)
+    level = building_state["level"]
     db.commit()
 
     return {"stage_clear": stage_clear, "building_level": level}
