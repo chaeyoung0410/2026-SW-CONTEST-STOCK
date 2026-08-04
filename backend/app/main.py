@@ -5,7 +5,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import auth, building, history, learning, quiz, result, stage, user
+from app.api.routes import auth, building, history, learning, news, quiz, result, stage, user
 from app.db.init_db import init_db
 from app.db.seed_data import seed_default_user, seed_if_empty
 from app.db.session import SessionLocal
@@ -43,6 +43,7 @@ app.include_router(quiz.router)
 app.include_router(result.router)
 app.include_router(building.router)
 app.include_router(history.router)
+app.include_router(news.router)
 
 app.mount("/assets", StaticFiles(directory=FRONTEND_DIR / "assets"), name="frontend-assets")
 app.mount("/pages", StaticFiles(directory=PAGES_DIR, html=True), name="frontend-pages")
