@@ -89,6 +89,7 @@ function showQuiz() {
     correctPage.style.display = "none";
     wrongPage.style.display = "none";
     conceptPage.style.display = "none";
+    replayMotion(quizPage);
 }
 
 function showCorrect() {
@@ -98,6 +99,7 @@ function showCorrect() {
     correctPage.style.display = "block";
     wrongPage.style.display = "none";
     conceptPage.style.display = "none";
+    replayMotion(correctPage);
 }
 
 function showWrong() {
@@ -107,6 +109,7 @@ function showWrong() {
     correctPage.style.display = "none";
     wrongPage.style.display = "block";
     conceptPage.style.display = "none";
+    replayMotion(wrongPage);
 }
 
 function showConcept() {
@@ -116,6 +119,7 @@ function showConcept() {
     correctPage.style.display = "none";
     wrongPage.style.display = "none";
     conceptPage.style.display = "flex";
+    replayMotion(conceptPage);
 }
 
 // 캐릭터 이동
@@ -323,7 +327,7 @@ async function advance() {
 
             if (result.stage_clear && currentStageId >= TOTAL_STAGES) {
                 popup.classList.remove("active");
-                window.location.href = "./final.html";
+                smoothNavigate("./final.html");
                 return;
             }
         } else {
@@ -394,15 +398,15 @@ popup.addEventListener("click", (e) => {
 
 // 하단 네비게이션
 document.querySelector('[data-nav="home"]').addEventListener("click", () => {
-    window.location.href = "./Gameplay.html";
+    smoothNavigate("./Gameplay.html");
 });
 
 document.querySelector('[data-nav="mypage"]').addEventListener("click", () => {
-    window.location.href = "./mypage.html";
+    smoothNavigate("./mypage.html");
 });
 
 document.querySelector('[data-nav="ai-recommend"]').addEventListener("click", () => {
-    window.location.href = "./ai.html";
+    smoothNavigate("./ai.html");
 });
 
 moveCharacter("start");

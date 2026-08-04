@@ -194,6 +194,20 @@ def seed_if_empty(db: Session) -> None:
                 tag=item["tag"],
             )
         )
+        db.add(
+            Question(
+                stage_id=item["stage_id"],
+                question="문제 추가 예정입니다.",
+                choice1="추가 예정",
+                choice2="추가 예정",
+                choice3="추가 예정",
+                choice4="추가 예정",
+                answer=1,
+                explanation="추가 예정입니다.",
+                difficulty=difficulty,
+                tag=item["tag"],
+            )
+        )
 
     db.commit()
 

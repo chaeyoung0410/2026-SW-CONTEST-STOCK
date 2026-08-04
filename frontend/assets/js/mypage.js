@@ -37,6 +37,7 @@ loadProfile();
 
 function openModal() {
   editIdModal.classList.add('is-open');
+  replayMotion(editIdModal.querySelector('.modal-box'));
   newIdInput.value = '';
   charCount.textContent = '0 / 16';
   newIdInput.focus();
@@ -95,7 +96,7 @@ modalConfirmBtn.addEventListener('click', async () => {
  
 //뒤로가기
 document.querySelector('.back-btn').addEventListener('click', () => {
-  window.history.back();
+  smoothBack();
 });
 
 //로그아웃
@@ -103,5 +104,5 @@ const logoutBtn = document.getElementById('logoutBtn');
 
 logoutBtn.addEventListener('click', () => {
   localStorage.removeItem('accessToken');
-  window.location.href = './Login.html';
+  smoothNavigate('./Login.html');
 });
