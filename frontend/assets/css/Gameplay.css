@@ -387,6 +387,7 @@
 
 .gameplay_building {
     position: relative;
+    pointer-events: none;
 }
 
 .building_img {
@@ -414,6 +415,7 @@
 
 /* 정답 페이지 */
 .correct_page {
+    margin-top: -10px;
     display: none;
     flex-direction: column;
     align-items: center;
@@ -472,6 +474,7 @@
 /* 카드 */
 .correct_card {
     width: 640px;
+    height: 610px;
     margin: 78px auto;
     background: white;
     border-radius: 28px;
@@ -484,8 +487,8 @@
 
 /* 캐릭터 */
 .result_character {
-    width: 200px;
-    margin-top: -20px;
+    width: 190px;
+    margin-top: -40px;
 }
 
 .result_character img {
@@ -493,22 +496,27 @@
 }
 
 .result_title {
-    margin-top: -10px;
-    font-size: 40px;
+    margin-top: -13px;
+    font-size: 37px;
     font-weight: 800;
     color: black;
 }
 
 .result_desc {
-    margin-top: -10px;
-    font-size: 24px;
+    text-align: center;
+    margin: -10px 10px 0 10px;
+    font-size: 23px;
     color: #666;
+    min-height: 80px;
+    max-height: 120px;
+    overflow-y: auto;
+    line-height: 1.6;
 }
 
 /* 성장도 */
 .upgrade_box {
     width: 95%;
-    margin-top: 30px;
+    margin-top: 45px;
 }
 
 .upgrade_header {
@@ -516,14 +524,14 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 14px;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
 }
 
 /* 진행바 */
 .upgrade_progress {
     width: 100%;
-    height: 16px;
+    height: 18px;
     background: #E8E8E8;
     border-radius: 99px;
     overflow: hidden;
@@ -539,7 +547,7 @@
 
 /* 건물 미리보기 */
 .building_preview {
-    margin-top: 25px;
+    margin-top: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -547,7 +555,7 @@
 }
 
 .building_preview img {
-    width: 90px;
+    width: 130px;
 }
 
 .building_preview span {
@@ -558,13 +566,14 @@
 /* 버튼 */
 .result_btn {
     width: 100%;
-    height: 74px;
-    margin-top: 45px;
+    height: 90px;
+    position: relative;
+    top: 40px;
     border: none;
     border-radius: 20px;
     background: linear-gradient(180deg, #A05EFF, #7E48E9);
     color: white;
-    font-size: 26px;
+    font-size: 30px;
     font-weight: 600;
     cursor: pointer;
     transition: 0.1s;

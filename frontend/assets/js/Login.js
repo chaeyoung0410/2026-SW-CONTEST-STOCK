@@ -41,6 +41,7 @@ loginButton.addEventListener("click", async () => {
 
     const login_id = userIdInput.value.trim();
     const password = passwordInput.value;
+    const API_BASE = "http://127.0.0.1:8000";
 
     if (!login_id || !password) {
         loginError.textContent = "아이디와 비밀번호를 입력해주세요.";
@@ -50,7 +51,7 @@ loginButton.addEventListener("click", async () => {
 
     try {
 
-        const response = await fetch("/login", {
+        const response = await fetch(`${API_BASE}/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
