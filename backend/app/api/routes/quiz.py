@@ -26,4 +26,10 @@ def submit_quiz_answer(
     current_user: User = Depends(get_current_user),
 ) -> dict:
     ensure_same_user(request.user_id, current_user)
-    return submit_answer(db, current_user.user_id, request.question_id, request.answer)
+    return submit_answer(
+        db,
+        current_user.user_id,
+        request.question_id,
+        request.answer,
+        request.submission_id,
+    )

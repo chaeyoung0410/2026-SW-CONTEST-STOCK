@@ -41,6 +41,11 @@ function renderRecommendation(slot, item) {
     desc.className = "rec-desc";
     desc.textContent = item.content || "곧 학습 콘텐츠가 추가될 예정이에요.";
     slot.appendChild(desc);
+
+    const reason = document.createElement("p");
+    reason.className = "rec-reason";
+    reason.textContent = item.recommendation_reason || "현재 학습 진도에 맞춰 추천했어요.";
+    slot.appendChild(reason);
 }
 
 async function loadRecommendations() {
@@ -62,6 +67,7 @@ async function loadRecommendations() {
 
         renderRecommendation(todaySlot, items[0]);
         if (todayCard) todayCard.dataset.stageId = items[0].stage_id;
+        if (todayCard) todayCard.dataset.recommendationId = items[0].recommendation_id;
 
         const restItems = items.slice(1);
         listRows.forEach((row, index) => {
@@ -77,6 +83,8 @@ async function loadRecommendations() {
             row.style.display = "";
             renderRecommendation(slot, item);
             if (btn) btn.dataset.stageId = item.stage_id;
+            row.dataset.stageId = item.stage_id;
+            row.dataset.recommendationId = item.recommendation_id;
         });
 
         if (!restItems.length && listCard) {
@@ -88,6 +96,37 @@ async function loadRecommendations() {
 }
 
 loadRecommendations();
+
+async function startRecommendation(container) {
+    const stageId = Number(container?.dataset.stageId);
+    const recommendationId = Number(container?.dataset.recommendationId);
+    if (!stageId) return;
+
+    if (recommendationId) {
+        try {
+            await apiFetch(`/learning/recommendations/${recommendationId}/click`, {
+                method: "POST",
+            });
+        } catch (error) {
+            // 클릭 이력 저장 실패가 학습 시작 자체를 막지는 않는다.
+            console.error(error);
+        }
+    }
+
+    sessionStorage.setItem("recommendedStageId", String(stageId));
+    if (recommendationId) {
+        sessionStorage.setItem("recommendedRecommendationId", String(recommendationId));
+    }
+    smoothNavigate("./Gameplay.html");
+}
+
+document.querySelector('[data-action="start-today"]').addEventListener("click", () => {
+    startRecommendation(todayCard);
+});
+
+document.querySelectorAll('[data-action="start-item"]').forEach((button) => {
+    button.addEventListener("click", () => startRecommendation(button.closest(".list-row")));
+});
 
 //뒤로가기
 document.querySelector('.back-btn').addEventListener('click', () => {

@@ -87,6 +87,16 @@ let correctCount = 0;
 let stageScore = 0;
 let lastExplanation = "";
 let lastConceptTag = "";
+let currentSubmissionId = null;
+let currentAnswerAttemptIds = [];
+let currentResultSubmissionId = null;
+let currentRecommendationId = null;
+
+function createSubmissionId() {
+    return window.crypto?.randomUUID
+        ? window.crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
 
 // 화면 전환 함수
 function showQuiz() {
@@ -195,6 +205,31 @@ async function loadStages() {
         const furthestCleared = clearedStageIds.length ? Math.max(...clearedStageIds) : 0;
 
         moveCharacter(furthestCleared > 0 ? furthestCleared : "start");
+
+        const recommendedStageId = Number(sessionStorage.getItem("recommendedStageId"));
+        const recommendedRecommendationId = Number(
+            sessionStorage.getItem("recommendedRecommendationId")
+        );
+        if (recommendedStageId) {
+            sessionStorage.removeItem("recommendedStageId");
+            sessionStorage.removeItem("recommendedRecommendationId");
+            const recommendedStage = stagesInfo.find((stage) => stage.stage_id === recommendedStageId);
+            if (recommendedStage && !recommendedStage.locked) {
+                currentRecommendationId = recommendedRecommendationId || null;
+                if (currentRecommendationId) {
+                    try {
+                        await apiFetch(
+                            `/learning/recommendations/${currentRecommendationId}/start`,
+                            { method: "POST" }
+                        );
+                    } catch (error) {
+                        // 시작 이력 실패가 퀴즈 진입 자체를 막지는 않는다.
+                        console.error(error);
+                    }
+                }
+                startStage(recommendedStageId, recommendedStage.title);
+            }
+        }
     } catch (error) {
         console.error(error);
     }
@@ -243,6 +278,8 @@ async function startStage(stageId, stageTitle) {
         currentQuestionIndex = 0;
         correctCount = 0;
         stageScore = 0;
+        currentAnswerAttemptIds = [];
+        currentResultSubmissionId = createSubmissionId();
 
         popup.classList.add("active");
         loadQuestion();
@@ -253,6 +290,7 @@ async function startStage(stageId, stageTitle) {
 
 function loadQuestion() {
     const question = currentQuestions[currentQuestionIndex];
+    currentSubmissionId = createSubmissionId();
 
     quizQuestion.textContent = question.question;
     options.forEach((btn, index) => {
@@ -281,6 +319,7 @@ options.forEach((button, index) => {
                     user_id: Number(userId),
                     question_id: question.question_id,
                     answer: selectedIndex,
+                    submission_id: currentSubmissionId,
                 }),
             });
 
@@ -293,6 +332,9 @@ options.forEach((button, index) => {
             }
 
             stageScore += result.score;
+            if (result.attempt_id && !currentAnswerAttemptIds.includes(result.attempt_id)) {
+                currentAnswerAttemptIds.push(result.attempt_id);
+            }
             lastExplanation = result.explanation;
             lastConceptTag = question.tag;
 
@@ -330,12 +372,16 @@ async function advance() {
                 score: stageScore,
                 correct_count: correctCount,
                 total_question: currentQuestions.length,
+                answer_attempt_ids: currentAnswerAttemptIds,
+                submission_id: currentResultSubmissionId,
+                recommendation_id: currentRecommendationId,
             }),
         });
 
         const result = await response.json();
 
         if (response.ok) {
+            currentRecommendationId = null;
             moveCharacter(currentStageId);
             await loadBuilding();
             await loadStages();
@@ -372,6 +418,8 @@ retryStageBtn.addEventListener("click", () => {
     currentQuestionIndex = 0;
     correctCount = 0;
     stageScore = 0;
+    currentAnswerAttemptIds = [];
+    currentResultSubmissionId = createSubmissionId();
     loadQuestion();
 });
 
@@ -391,6 +439,7 @@ stages.forEach((stageEl) => {
             return;
         }
 
+        currentRecommendationId = null;
         startStage(stageNum, info ? info.title : `Stage ${stageNum}`);
     });
 });

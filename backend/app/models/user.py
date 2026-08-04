@@ -19,3 +19,5 @@ class User(Base):
     progress = relationship("Progress", back_populates="user")
     results = relationship("Result", back_populates="user")
     histories = relationship("History", back_populates="user")
+    answer_attempts = relationship("AnswerAttempt", back_populates="user")
+    recommendation_history = relationship("RecommendationHistory", back_populates="user")

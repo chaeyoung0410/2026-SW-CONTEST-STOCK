@@ -24,4 +24,7 @@ def save_stage_result(
         request.score,
         request.correct_count,
         request.total_question,
+        request.answer_attempt_ids,
+        request.submission_id,
+        request.recommendation_id,
     )

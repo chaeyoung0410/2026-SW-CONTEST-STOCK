@@ -14,7 +14,7 @@ def get_learning(db: Session, stage_id: int, user_id: int | None = None) -> dict
             .order_by(Learning.page_order)
         )
     )
-    content = "\n\n".join(page.content for page in pages)
+    content = "\n\n".join(page.content for page in pages) or stage.description
     return {
         "stage_id": stage.stage_id,
         "title": pages[0].title if pages else stage.title,
