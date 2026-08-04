@@ -68,7 +68,7 @@ signupButton.addEventListener("click", async () => {
     }
 
     try {
-        const signupResponse = await fetch("/signup", {
+        const signupResponse = await fetch("http://127.0.0.1:8000/signup", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -85,7 +85,7 @@ signupButton.addEventListener("click", async () => {
         }
 
         // 가입 성공 시 바로 로그인 처리 후 게임 화면으로 이동
-        const loginResponse = await fetch("/login", {
+        const loginResponse = await fetch("http://127.0.0.1:8000/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
