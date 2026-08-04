@@ -78,6 +78,7 @@ let correctCount = 0;
 let stageScore = 0;
 let lastExplanation = "";
 let lastConceptTag = "";
+let currentSubmissionId = null;
 
 // 화면 전환 함수
 function showQuiz() {
@@ -186,6 +187,15 @@ async function loadStages() {
         const furthestCleared = clearedStageIds.length ? Math.max(...clearedStageIds) : 0;
 
         moveCharacter(furthestCleared > 0 ? furthestCleared : "start");
+
+        const recommendedStageId = Number(sessionStorage.getItem("recommendedStageId"));
+        if (recommendedStageId) {
+            sessionStorage.removeItem("recommendedStageId");
+            const recommendedStage = stagesInfo.find((stage) => stage.stage_id === recommendedStageId);
+            if (recommendedStage && !recommendedStage.locked) {
+                startStage(recommendedStageId, recommendedStage.title);
+            }
+        }
     } catch (error) {
         console.error(error);
     }
@@ -236,6 +246,9 @@ async function startStage(stageId, stageTitle) {
 
 function loadQuestion() {
     const question = currentQuestions[currentQuestionIndex];
+    currentSubmissionId = window.crypto?.randomUUID
+        ? window.crypto.randomUUID()
+        : `${Date.now()}-${question.question_id}-${Math.random().toString(16).slice(2)}`;
 
     quizQuestion.textContent = question.question;
     options.forEach((btn, index) => {
@@ -264,6 +277,7 @@ options.forEach((button, index) => {
                     user_id: Number(userId),
                     question_id: question.question_id,
                     answer: selectedIndex,
+                    submission_id: currentSubmissionId,
                 }),
             });
 

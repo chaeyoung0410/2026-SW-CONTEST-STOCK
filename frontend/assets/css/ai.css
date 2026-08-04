@@ -111,6 +111,17 @@ body {
   overflow: hidden;
 }
 
+.card-content .rec-reason {
+  margin-top: 5px;
+  color: #b9afff;
+  font-size: 12px;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /*  버튼  */
 .btn {
   position: absolute;

@@ -22,6 +22,13 @@ def save_result(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     if db.get(Stage, stage_id) is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Stage not found")
+    if score < 0 or total_question <= 0:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid result counts")
+    if correct_count is not None and (correct_count < 0 or correct_count > total_question):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="correct_count cannot exceed total_question",
+        )
 
     resolved_correct_count = correct_count if correct_count is not None else min(total_question, score // 10)
     accuracy = round((resolved_correct_count / total_question) * 100, 2)
@@ -46,10 +53,14 @@ def save_result(
         progress.score = max(progress.score, score)
         progress.accuracy = max(progress.accuracy, accuracy)
 
-    db.add(result)
-    db.add(history)
-    db.flush()
-    level, _ = get_building_state(db, user_id)
-    db.commit()
+    try:
+        db.add(result)
+        db.add(history)
+        db.flush()
+        level, _ = get_building_state(db, user_id)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
 
     return {"stage_clear": stage_clear, "building_level": level}
