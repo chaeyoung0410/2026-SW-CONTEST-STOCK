@@ -1,0 +1,232 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #14103a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+
+.app-frame {
+  position: relative;
+  width: 100%;
+  max-width: 1536px;
+  aspect-ratio: 1536 / 1024;
+  margin: 0 auto;
+  background-image: url("../img/ai.png");
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+/* 뒤로가기 버튼 */
+.icon-btn {
+  position: absolute;
+  top: 2.2%;
+  width: 6.2%;
+  height: 9.3%;
+  aspect-ratio: 1 / 1;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.icon-btn img {
+  width: 68%;
+  height: 68%;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+}
+
+.back-btn { left: 1.69%; }
+
+/*  오늘의 추천 (상단 카드)  */
+.today-card {
+  position: absolute;
+  left: 28.91%;
+  top: 16.60%;
+  width: 62.70%;
+  height: 17.87%;
+}
+
+/* AI콘텐츠 영역  */
+.today-card .card-content {
+  position: absolute;
+  left: 18.07%;
+  top: 0;
+  width: 40%;
+  height: 100%;
+}
+
+/*  추천 학습 콘텐츠 (리스트 카드)  */
+.list-card {
+  position: absolute;
+  left: 28.91%;
+  top: 40.63%;
+  width: 62.70%;
+  height: 37.79%;
+}
+
+.list-row {
+  position: relative;
+  width: 100%;
+  height: 33.333%;
+}
+
+.list-row .card-content {
+  position: absolute;
+  left: 18.07%;
+  top: 0;
+  width: 55%;
+  height: 100%;
+  
+}
+
+/*  버튼  */
+.btn {
+  position: absolute;
+  border: none;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.15s ease, transform 0.05s ease;
+  font-size: 17px;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+/*학습시작 (primary)*/
+.btn-primary {
+  left: 59.81%;
+  top: 66.67%;
+  width: 13.08%;
+  height: 21.86%;
+  background: #5638be;
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(86, 56, 190, 0.45);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+/* 리스트 카드 각 항목 - "학습하기" (Secondary) */
+.btn-secondary {
+  left: 78.30%;
+  top: 50%;
+  width: 19.73%;
+  height: 41%;
+  background: #ede8f8;
+  color: #3b2aae;
+  font-size: 16px;
+}
+
+.btn-secondary:hover {
+  background: #e1d9f5;
+}
+
+.bottom-nav {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 12%;
+  background: #191d47;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* 일반 메뉴 */
+.nav-item {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  border: none;
+  background: none;
+  cursor: pointer;
+
+  color: #b9b6da;
+  font-size: 15px;
+  font-weight: 600;
+  transition: color .2s;
+}
+
+/* 아이콘 크기 증가 */
+.nav-item img {
+  width: 55px;
+  height: 55px;
+}
+
+/* 위치 */
+.nav-item[data-nav="home"] {
+  left: 15.8%;
+}
+
+.nav-item[data-nav="mypage"] {
+  left: 80.5%;
+}
+
+.nav-item:hover {
+  color: #fff;
+}
+
+/* 가운데 버튼 */
+.nav-item--active {
+  left: 50%;
+
+  display: flex;
+  flex-direction: column;   
+  justify-content: center;
+  align-items: center;
+
+  width: 190px;             
+  height: 115px;
+
+  gap: 8px;
+
+  border-radius: 24px;
+
+  background: linear-gradient(
+    180deg,
+    #6b4de8 0%,
+    #4b2fae 100%
+  );
+
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+
+  box-shadow: 0 8px 20px rgba(75,47,174,.45);
+
+  white-space: nowrap;
+}
+
+/* 가운데 아이콘 크게 */
+.nav-item--active img{
+  width:60px;
+  height:60px;
+}
+
+.nav-item--active:hover{
+  filter:brightness(1.08);
+}
+
