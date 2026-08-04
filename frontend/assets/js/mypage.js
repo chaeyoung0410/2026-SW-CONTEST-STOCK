@@ -6,7 +6,6 @@ const modalConfirmBtn = document.getElementById('modalConfirmBtn');
 const newIdInput = document.getElementById('newIdInput');
 const charCount = document.getElementById('charCount');
 const userId = document.getElementById('userId');
-const API_BASE = "http://127.0.0.1:8000";
 
 // 로그인한 사용자 정보 불러오기
 async function loadProfile() {
@@ -17,7 +16,7 @@ async function loadProfile() {
   }
 
   try {
-    const response = await fetch(`${API_BASE}/user`, {
+    const response = await fetch('/user', {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -71,7 +70,7 @@ modalConfirmBtn.addEventListener('click', async () => {
   const token = localStorage.getItem('accessToken');
 
   try {
-    const response = await fetch(`${API_BASE}/user`, {
+    const response = await fetch('/user', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
