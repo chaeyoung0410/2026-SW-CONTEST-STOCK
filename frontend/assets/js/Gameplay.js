@@ -69,6 +69,15 @@ const player = document.getElementById("playerCharacter");
 const building = document.getElementById("myBuilding");
 const buildingLevel = document.getElementById("buildingLevel");
 
+const buildingProgressFill =
+    document.getElementById("buildingProgressFill");
+
+const buildingPercent =
+    document.getElementById("buildingPercent");
+
+const nextLevelList =
+    document.getElementById("nextLevelList");
+
 const TOTAL_STAGES = 14;
 
 let stagesInfo = [];
@@ -201,6 +210,14 @@ async function loadBuilding() {
         const data = await response.json();
         building.src = `../assets/img/${data.image}`;
         buildingLevel.textContent = `Lv.${data.level}`;
+        buildingProgressFill.style.width = `${data.progress}%`;
+        buildingPercent.textContent = `${data.progress}%`;
+
+        nextLevelList.innerHTML = "";
+
+        data.next_features.forEach(feature => {
+            nextLevelList.innerHTML += `<li>${feature}</li>`;
+        });
     } catch (error) {
         console.error(error);
     }

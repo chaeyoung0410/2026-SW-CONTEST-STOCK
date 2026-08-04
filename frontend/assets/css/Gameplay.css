@@ -1016,3 +1016,68 @@
 .nav-item--active:hover {
     filter: brightness(1.08);
 }
+
+/* ========================================== */
+
+.building_progress_wrap {
+    width: 250px;
+    margin: 305px 0 0 1210px;
+}
+
+.building_progress_header {
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.building_progress_bg {
+    margin-top: 10px;
+    width: 100%;
+    height: 14px;
+    border-radius: 999px;
+    background: #2B3157;
+    overflow: hidden;
+}
+
+.building_progress_fill {
+    width: 0%;
+    height: 100%;
+    background: #9B5CFF;
+    border-radius: 999px;
+    transition: .4s;
+}
+
+
+.next_level_box {
+    position: absolute;
+    left: 1210px;
+    top: 660px;
+    width: 220px;
+}
+
+.next_level_title {
+    color: white;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.next_level_box ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.next_level_box li {
+    color: white;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.next_level_box li::before {
+    content: "✔";
+    color: #B56BFF;
+    margin-right: 8px;
+}

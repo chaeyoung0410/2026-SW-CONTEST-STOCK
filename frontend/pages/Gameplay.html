@@ -39,8 +39,29 @@
             <p id="buildingLevel">Lv. 0</p>
             <p class="level_2">단계를 클리어 할 수록<br />건물이 발전해요!</p>
             <img src="../assets/img/building_1.png" id="myBuilding" class="building_img">
-            <p>건물 성장도</p>
-            <div class="next_level_box"></div>
+            <!-- 건물 성장도 -->
+            <div class="building_progress_wrap">
+                <div class="building_progress_header">
+                    <span>건물 성장도</span>
+                    <span id="buildingPercent">20%</span>
+                </div>
+
+                <div class="building_progress_bg">
+                    <div class="building_progress_fill" id="buildingProgressFill"></div>
+                </div>
+            </div>
+
+            <!-- 다음 레벨 -->
+            <div class="next_level_box">
+                <div class="next_level_title">
+                    ✨ 다음 레벨에서 변화해요!
+                </div>
+                <ul id="nextLevelList">
+                    <li>외관 업그레이드</li>
+                    <li>간판 설치</li>
+                    <li>조명 추가</li>
+                </ul>
+            </div>
         </div>
 
         <!-- 퀴즈 팝업 -->

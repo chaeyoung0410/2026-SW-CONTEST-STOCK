@@ -15,5 +15,5 @@ def get_building(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> BuildingResponse:
-    level, image = get_building_state(db, current_user.user_id)
-    return BuildingResponse(level=level, image=image)
+    state = get_building_state(db, current_user.user_id)
+    return BuildingResponse(**state)
