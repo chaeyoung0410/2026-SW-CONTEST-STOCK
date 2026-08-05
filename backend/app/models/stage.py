@@ -17,3 +17,5 @@ class Stage(Base):
     progress = relationship("Progress", back_populates="stage")
     results = relationship("Result", back_populates="stage")
     histories = relationship("History", back_populates="stage")
+    answer_attempts = relationship("AnswerAttempt", back_populates="stage")
+    recommendation_history = relationship("RecommendationHistory", back_populates="stage")
