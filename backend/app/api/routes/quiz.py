@@ -5,7 +5,9 @@ from app.api.deps import ensure_same_user, get_current_user
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.quiz import AnswerRequest, AnswerResponse, QuestionResponse
+from app.schemas.remedial import RemedialQuestionsResponse
 from app.services.quiz_service import get_questions, submit_answer
+from app.services.remedial_service import get_or_generate_remedial_questions
 
 router = APIRouter(tags=["Quiz"])
 
@@ -32,4 +34,20 @@ def submit_quiz_answer(
         request.question_id,
         request.answer,
         request.submission_id,
+    )
+
+
+@router.post(
+    "/question/{question_id}/remedial",
+    response_model=RemedialQuestionsResponse,
+)
+def generate_question_remediation(
+    question_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> RemedialQuestionsResponse:
+    return get_or_generate_remedial_questions(
+        db,
+        current_user.user_id,
+        question_id,
     )

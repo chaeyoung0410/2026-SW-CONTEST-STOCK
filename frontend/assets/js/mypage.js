@@ -35,6 +35,58 @@ async function loadProfile() {
 
 loadProfile();
 
+// 경제 뉴스 불러오기
+async function loadNews() {
+  const adPlaceholder = document.getElementById('adPlaceholder');
+  const token = localStorage.getItem('accessToken');
+  if (!adPlaceholder || !token) return;
+
+  try {
+    const response = await fetch('/news', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) return;
+
+    const items = await response.json();
+    adPlaceholder.innerHTML = '';
+
+    if (!items.length) {
+      const empty = document.createElement('p');
+      empty.className = 'news-empty';
+      empty.textContent = '지금은 불러올 뉴스가 없어요.';
+      adPlaceholder.appendChild(empty);
+      return;
+    }
+
+    items.forEach((item) => {
+      const link = document.createElement('a');
+      link.className = 'news-item';
+      link.href = item.link;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+
+      const title = document.createElement('span');
+      title.textContent = item.title;
+      link.appendChild(title);
+
+      const date = document.createElement('span');
+      date.className = 'news-date';
+      const parsed = new Date(item.published);
+      date.textContent = Number.isNaN(parsed.getTime())
+        ? item.published
+        : parsed.toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      link.appendChild(date);
+
+      adPlaceholder.appendChild(link);
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+loadNews();
+
 function openModal() {
   editIdModal.classList.add('is-open');
   replayMotion(editIdModal.querySelector('.modal-box'));
@@ -42,24 +94,24 @@ function openModal() {
   charCount.textContent = '0 / 16';
   newIdInput.focus();
 }
- 
+
 function closeModal() {
   editIdModal.classList.remove('is-open');
 }
- 
+
 editIdBtn.addEventListener('click', openModal);
 modalCloseBtn.addEventListener('click', closeModal);
 modalCancelBtn.addEventListener('click', closeModal);
- 
+
 // 오버레이 바깥(어두운 영역) 클릭 시 닫기
 editIdModal.addEventListener('click', (e) => {
   if (e.target === editIdModal) closeModal();
 });
- 
+
 newIdInput.addEventListener('input', () => {
   charCount.textContent = `${newIdInput.value.length} / 16`;
 });
- 
+
 modalConfirmBtn.addEventListener('click', async () => {
   const value = newIdInput.value.trim();
   if (value.length < 2) {
@@ -93,7 +145,7 @@ modalConfirmBtn.addEventListener('click', async () => {
     alert('서버와 연결할 수 없습니다.');
   }
 });
- 
+
 //뒤로가기
 document.querySelector('.back-btn').addEventListener('click', () => {
   smoothBack();
@@ -104,5 +156,6 @@ const logoutBtn = document.getElementById('logoutBtn');
 
 logoutBtn.addEventListener('click', () => {
   localStorage.removeItem('accessToken');
+  localStorage.removeItem('userId');
   smoothNavigate('./Login.html');
 });

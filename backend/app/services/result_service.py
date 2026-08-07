@@ -56,8 +56,8 @@ def _idempotent_result_response(
             status_code=status.HTTP_409_CONFLICT,
             detail="submission_id was already used for a different result",
         )
-    level, _ = get_building_state(db, existing.user_id)
-    return {"stage_clear": True, "building_level": level}
+    building_state = get_building_state(db, existing.user_id)
+    return {"stage_clear": True, "building_level": building_state["level"]}
 
 
 def save_result(
@@ -213,7 +213,8 @@ def save_result(
             recommendation.learning_completed = True
             recommendation.completed_at = recommendation.completed_at or completed_at
             recommendation.completion_result_id = result.result_id
-        level, _ = get_building_state(db, user_id)
+        building_state = get_building_state(db, user_id)
+        level = building_state["level"]
         db.commit()
     except IntegrityError:
         db.rollback()
