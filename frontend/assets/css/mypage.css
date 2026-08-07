@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 * {
   margin: 0;
   padding: 0;
@@ -166,8 +165,6 @@ body {
   font-size: 0.85em;
 }
 
-/* 광고 이미지.
-   예: adPlaceholder.innerHTML = '<img src="ad.jpg">'; */
 .ad-placeholder {
   position: absolute;
   left: 2.76%;
@@ -175,16 +172,52 @@ body {
   width: 94.47%;
   height: 71.83%;
   border-radius: 24px;
+  background: rgba(255, 255, 255, 0.55);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow-y: auto;
+  padding: 4px 0;
 }
 
 .ad-placeholder img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.news-empty {
+  margin: auto;
+  color: #7a72a8;
+  font-size: 14px;
+}
+
+.news-item {
+  display: block;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(61, 46, 133, 0.12);
+  color: #3d2e85;
+  text-decoration: none;
+  font-size: clamp(13px, 1.3vw, 15px);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.news-item:last-child {
+  border-bottom: none;
+}
+
+.news-item:hover {
+  background: rgba(61, 46, 133, 0.06);
+}
+
+.news-item .news-date {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #9088b8;
 }
 
 /*  아이디 수정 팝업  */
@@ -355,361 +388,3 @@ body {
   color: #ffffff;
 }
 
-=======
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background: #0a0a1f;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-}
-
-.screen {
-  position: relative;
-  width: 100%;
-  max-width: 1535px;
-  aspect-ratio: 1535 / 1024;
-  background-image: url("../img/mypage.png");
-  background-size: cover;
-  background-position: center;
-  overflow: hidden;
-}
-
-@media (max-width: 1535px) {
-  .screen { width: 100vw; }
-}
-
-/* 상단 아이콘 버튼 */
-
-.icon-btn {
-  position: absolute;
-  top: 2.2%;
-  width: 6.2%;
-  height: 9.3%;
-  aspect-ratio: 1 / 1;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0;
-}
-
-.icon-btn img {
-  width: 68%;
-  height: 68%;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
-}
-
-.back-btn { left: 2.08%; }
-
-
-/*  프로필 카드  */
-
-.profile-card {
-  position: absolute;
-  left: 13.16%;
-  top: 21.09%;
-  width: 70.75%;
-  height: 33.40%;
-}
-
-/* 아이디 표시 영역 - 나중에 JS로 텍스트만 채우면 됨 */
-.user-id {
-  position: absolute;
-  left: 28.82%;
-  top: 12.87%;
-  width: 66.39%;
-  height: 14.04%;
-  display: flex;
-  align-items: center;
-  color: #ffffff;
-  font-size: clamp(16px, 1.9vw, 28px);
-  font-weight: 700;
-}
-
-.profile-row {
-  position: absolute;
-  left: 28.82%;
-  width: 66.39%;
-  height: 21.35%;
-  border: none;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.06);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 5%;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.profile-row:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-#editIdBtn { top: 28%; }
-#logoutBtn { top: 60%; }
-
-.row-left {
-  display: flex;
-  align-items: center;
-  gap: 3.5%;
-  min-width: 0;
-  flex: 1;
-}
-
-.row-icon {
-  width: clamp(28px, 2.6vw, 42px);
-  height: clamp(28px, 2.6vw, 42px);
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
-.logout-icon {
-  width: clamp(30px, 2.9vw, 46px);
-  height: clamp(30px, 2.9vw, 46px);
-}
-
-.row-text {
-  color: #f2eefc;
-  font-size: clamp(13px, 1.5vw, 22px);
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.row-chevron {
-  width: clamp(14px, 1.2vw, 20px);
-  height: clamp(14px, 1.2vw, 20px);
-  opacity: 0.8;
-  flex-shrink: 0;
-}
-
-/* 광고 영역  */
-
-.ad-card {
-  position: absolute;
-  left: 13.16%;
-  top: 54.69%;
-  width: 70.75%;
-  height: 41.60%;
-}
-
-.ad-label {
-  position: absolute;
-  left: 3.31%;
-  top: 7.04%;
-  font-size: clamp(16px, 1.7vw, 24px);
-  font-weight: 700;
-  color: #3d2e85;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.sparkle {
-  font-size: 0.85em;
-}
-
-/* 광고 이미지.
-   예: adPlaceholder.innerHTML = '<img src="ad.jpg">'; */
-.ad-placeholder {
-  position: absolute;
-  left: 2.76%;
-  top: 21.13%;
-  width: 94.47%;
-  height: 71.83%;
-  border-radius: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.ad-placeholder img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/*  아이디 수정 팝업  */
- 
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(10, 8, 30, 0.6);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  padding: 20px;
-}
- 
-.modal-overlay.is-open {
-  display: flex;
-}
- 
-.modal-box {
-  width: 100%;
-  max-width: 460px;
-  background: #f3f0fb;
-  border-radius: 24px;
-  padding: 32px 28px 28px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-  animation: modal-pop 0.18s ease;
-}
- 
-@keyframes modal-pop {
-  from { transform: scale(0.96); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
-}
- 
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
- 
-.modal-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 22px;
-  font-weight: 800;
-  color: #241c4f;
-}
- 
-.modal-title .sparkle {
-  font-size: 0.85em;
-  color: #8b5cf6;
-}
- 
-.modal-close {
-  width: 34px;
-  height: 34px;
-  border: none;
-  border-radius: 50%;
-  background: #e4defa;
-  color: #6d3fe0;
-  font-size: 15px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s ease;
-}
- 
-.modal-close:hover {
-  background: #d5cbf7;
-}
- 
-.modal-subtitle {
-  text-align: center;
-  color: #6b6483;
-  font-size: 14.5px;
-  margin-bottom: 22px;
-}
- 
-.modal-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 700;
-  color: #241c4f;
-  margin-bottom: 8px;
-}
- 
-.modal-input-wrap {
-  position: relative;
-  margin-bottom: 12px;
-}
-
- 
-.modal-input {
-  width: 100%;
-  height: 52px;
-  border: 1.5px solid #d9d2f2;
-  border-radius: 14px;
-  background: #ffffff;
-  padding: 0 60px 0 16px;
-  font-size: 15px;
-  color: #241c4f;
-  outline: none;
-  transition: border-color 0.15s ease;
-}
- 
-.modal-input:focus {
-  border-color: #8b5cf6;
-}
- 
-.modal-input::placeholder {
-  color: #b3acc9;
-}
- 
-.char-count {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 13px;
-  color: #a29bbd;
-  pointer-events: none;
-}
- 
-.modal-hint {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: #8a83a3;
-  margin-bottom: 26px;
-}
- 
-.hint-icon {
-  font-size: 13px;
-  color: #a29bbd;
-}
- 
-.modal-actions {
-  display: flex;
-  gap: 12px;
-}
- 
-.modal-btn {
-  flex: 1;
-  height: 52px;
-  border: none;
-  border-radius: 14px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: opacity 0.15s ease;
-}
- 
-.modal-btn:hover {
-  opacity: 0.9;
-}
- 
-.modal-btn-cancel {
-  background: #dcd5f4;
-  color: #5b4fa0;
-}
- 
-.modal-btn-confirm {
-  background: linear-gradient(90deg, #7c5cfc, #5b3ce0);
-  color: #ffffff;
-}
-
->>>>>>> origin/pre-develop
