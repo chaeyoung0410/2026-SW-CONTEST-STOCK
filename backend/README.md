@@ -22,3 +22,7 @@ mysql+pymysql://USER:PASSWORD@HOST:PORT/DB_NAME
 ```
 
 The database models follow `docs/04_database.md`.
+
+AI 추천 API와 데이터베이스 변경 방법은 각각
+[`docs/ai_recommendation_api.md`](docs/ai_recommendation_api.md),
+[`migrations/README.md`](migrations/README.md)를 참고하세요.

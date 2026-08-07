@@ -5,7 +5,6 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import auth, building, history, learning, news, quiz, result, stage, user
 from app.db.init_db import init_db
 from app.db.seed_data import seed_default_user, seed_if_empty
 from app.db.session import SessionLocal
