@@ -66,6 +66,9 @@ body {
   top: 0;
   width: 40%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 /*  추천 학습 콘텐츠 (리스트 카드)  */
@@ -89,13 +92,16 @@ body {
   top: 0;
   width: 55%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
 }
 
 .card-content .rec-title {
   font-size: 18px;
   font-weight: 700;
-  color: #ffffff;
+  color: #1f1b3a;
   margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
@@ -104,7 +110,7 @@ body {
 
 .card-content .rec-desc {
   font-size: 13px;
-  color: #cfcbe8;
+  color: #6b6786;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -113,7 +119,7 @@ body {
 
 .card-content .rec-reason {
   margin-top: 5px;
-  color: #b9afff;
+  color: #7a5fd4;
   font-size: 12px;
   line-height: 1.35;
   display: -webkit-box;
