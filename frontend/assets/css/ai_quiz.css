@@ -1,0 +1,299 @@
+/* ============================================================
+   AI 추천 퀴즈 팝업 스타일 (ai.html 전용)
+   게임플레이 화면(Gameplay.css)의 퀴즈 스타일과는 별개입니다.
+   ============================================================ */
+
+.quiz_popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 12, 40, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+}
+
+.quiz_popup.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.quiz_container {
+  position: relative;
+  width: 90%;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px 28px 28px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  transform: translateY(16px) scale(0.98);
+  transition: transform 0.2s ease;
+}
+
+.quiz_popup.is-open .quiz_container {
+  transform: translateY(0) scale(1);
+}
+
+.quiz_popup_close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #f2f1f8;
+  border-radius: 50%;
+  font-size: 20px;
+  line-height: 1;
+  color: #6b6786;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.quiz_popup_close:hover {
+  background: #e5e2f5;
+}
+
+/* ---------------- 진행바 ---------------- */
+.quiz_header {
+  margin-bottom: 20px;
+  padding-right: 24px;
+}
+
+.quiz_progress_bg {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: #ede8f8;
+  overflow: hidden;
+}
+
+.quiz_progress_bar {
+  height: 100%;
+  width: 0%;
+  background: #5638be;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+/* ---------------- 문제 화면 ---------------- */
+.quiz_page {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.quiz_page.is-active {
+  display: flex;
+}
+
+.quiz_character img {
+  width: 96px;
+  height: auto;
+  margin-bottom: 12px;
+}
+
+.quiz_content {
+  width: 100%;
+}
+
+.quiz_question {
+  font-size: 19px;
+  font-weight: 700;
+  color: #1f1b3a;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.quiz_options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.quiz_option {
+  text-align: left;
+  padding: 14px 16px;
+  border: 1.5px solid #e5e2f5;
+  border-radius: 12px;
+  background: #ffffff;
+  font-size: 15px;
+  color: #2d2a4a;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.quiz_option:hover:not(:disabled) {
+  border-color: #b7a8ea;
+  background: #f8f6fd;
+}
+
+.quiz_option.is-selected {
+  border-color: #5638be;
+  background: #f1edfb;
+  font-weight: 600;
+}
+
+.quiz_option:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* ---------------- 정답/오답/개념 화면 ---------------- */
+.correct_page,
+.wrong_page,
+.concept_page {
+  display: none;
+  text-align: center;
+}
+
+.correct_page.is-active,
+.wrong_page.is-active,
+.concept_page.is-active {
+  display: block;
+}
+
+.correct_ribbon {
+  display: inline-block;
+  background: #2fa84f;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+
+.wrong_ribbon {
+  display: inline-block;
+  background: #d9534f;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+
+.result_character img,
+.wrong_character img {
+  width: 88px;
+  height: auto;
+  margin-bottom: 12px;
+}
+
+.result_title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1f1b3a;
+  margin-bottom: 8px;
+}
+
+.result_desc {
+  font-size: 14px;
+  color: #6b6786;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* ---------------- 오답 상세 ---------------- */
+.selected_answer,
+.correct_answer_box {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #2d2a4a;
+}
+
+.selected_answer .wrong {
+  color: #d9534f;
+  font-weight: 700;
+}
+
+.correct_answer_box {
+  margin-bottom: 20px;
+}
+
+.correct_answer_box .correct {
+  color: #2fa84f;
+  font-weight: 700;
+}
+
+/* ---------------- 버튼 공통 ---------------- */
+.result_btn,
+.wrong_btn {
+  width: 100%;
+  padding: 14px 0;
+  border: none;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s ease, background 0.15s ease;
+}
+
+.result_btn {
+  background: #5638be;
+  color: #ffffff;
+}
+
+.result_btn:hover {
+  filter: brightness(1.08);
+}
+
+.wrong_btn {
+  background: #ede8f8;
+  color: #3b2aae;
+}
+
+.wrong_btn:hover {
+  background: #e1d9f5;
+}
+
+/* ---------------- 개념 설명 화면 ---------------- */
+.concept_title {
+  font-size: 19px;
+  font-weight: 800;
+  color: #1f1b3a;
+  margin-bottom: 16px;
+}
+
+.concept_box {
+  background: #f8f6fd;
+  border-radius: 14px;
+  padding: 18px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.concept_box h3 {
+  font-size: 16px;
+  color: #4b3aa4;
+  margin-bottom: 6px;
+}
+
+.concept_box p {
+  font-size: 14px;
+  color: #4a4568;
+  line-height: 1.6;
+}
+
+.concept_tip {
+  display: flex;
+  gap: 10px;
+  text-align: left;
+  font-size: 13px;
+  color: #6b6786;
+  margin-top: 16px;
+}
+
+.concept_tip strong {
+  color: #4b3aa4;
+  display: block;
+  margin-bottom: 2px;
+}
