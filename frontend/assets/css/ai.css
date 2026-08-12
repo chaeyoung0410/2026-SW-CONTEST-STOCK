@@ -15,8 +15,7 @@ body {
 .app-frame {
   position: relative;
 
-  width: 100%;
-  max-width: 1536px;
+  width: 1536px;
   aspect-ratio: 1536 / 1024;
 
   margin: 0 auto;
@@ -70,8 +69,8 @@ body {
 /* AI콘텐츠 영역  */
 .today-card .card-content {
   position: absolute;
-  left: 20%;
-  top: 35%;
+  left: 28%;
+  top: 36%;
   width: 40%;
   height: 100%;
 }
@@ -79,8 +78,8 @@ body {
 /*  추천 학습 콘텐츠 (리스트 카드)  */
 .list-card {
   position: absolute;
-  left: 28.91%;
-  top: 40.63%;
+  left: 32%;
+  top: 43.5%;
   width: 62.70%;
   height: 37.79%;
 }
@@ -124,10 +123,8 @@ body {
   color: #3d2e8f;
   font-size: 1cqw;
   line-height: 1.35;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+
+  white-space: nowrap;
 }
 
 /*  버튼  */
@@ -150,8 +147,8 @@ body {
 
 /*학습시작 (primary)*/
 .btn-primary {
-  left: 59.81%;
-  top: 45%;
+  left: 27.5%;
+  top: 91%;
   width: 13.08%;
   height: 21.86%;
   background: #5638be;
@@ -164,8 +161,8 @@ body {
 
 /* 리스트 카드 각 항목 - "학습하기" (Secondary) */
 .btn-secondary {
-  left: 78%;
-  top: 60%;
+  left: 70%;
+  top: 62%;
   width: 19.73%;
   height: 41%;
   background: #c9bdf0;

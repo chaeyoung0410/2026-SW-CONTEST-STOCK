@@ -18,7 +18,7 @@
     border-radius: 48px;
     background: linear-gradient(to bottom, #743BD1, #422091);
     border: 9px solid #D188F8;
-    margin-top: 550px;
+    margin-top: 540px;
     margin-left: 100px;
 
     display: flex;
@@ -39,7 +39,6 @@
 
 .index_char{
     width: 401px;
-    height: 459px;
-    margin-top: 420px;
+    margin-top: 400px;
     margin-left: 30px;
 }
