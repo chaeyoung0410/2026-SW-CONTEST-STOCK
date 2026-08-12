@@ -59,6 +59,9 @@ const conceptBtn = document.getElementById("conceptBtn");
 const buildingProgressBar = document.getElementById("buildingProgressBar");
 const buildingProgressText = document.getElementById("buildingProgressText");
 const selectedAnswerText = document.getElementById("selectedAnswer");
+const remedialPrompt = document.getElementById("remedialPrompt");
+const remedialStatus = document.getElementById("remedialStatus");
+const remedialStartBtn = document.getElementById("remedialStartBtn");
 
 const wrongBuildingProgressBar = document.getElementById("wrongBuildingProgressBar");
 const wrongBuildingProgressText = document.getElementById("wrongBuildingProgressText");
@@ -91,6 +94,7 @@ let currentSubmissionId = null;
 let currentAnswerAttemptIds = [];
 let currentResultSubmissionId = null;
 let currentRecommendationId = null;
+let remedialRequestSequence = 0;
 
 function createSubmissionId() {
     return window.crypto?.randomUUID
@@ -291,6 +295,10 @@ async function startStage(stageId, stageTitle) {
 function loadQuestion() {
     const question = currentQuestions[currentQuestionIndex];
     currentSubmissionId = createSubmissionId();
+    remedialRequestSequence += 1;
+    RemedialQuiz.reset();
+    remedialPrompt.hidden = true;
+    remedialStartBtn.disabled = true;
 
     quizQuestion.textContent = question.question;
     options.forEach((btn, index) => {
@@ -301,6 +309,27 @@ function loadQuestion() {
     progressBar.style.width = `${((currentQuestionIndex + 1) / currentQuestions.length) * 100}%`;
 
     showQuiz();
+}
+
+async function prepareRemedialQuestions(questionId) {
+    const requestSequence = ++remedialRequestSequence;
+    remedialPrompt.hidden = false;
+    remedialStatus.textContent = "AI가 오답에 맞는 추가 문제를 만들고 있어요...";
+    remedialStartBtn.disabled = true;
+
+    const result = await RemedialQuiz.prepare(questionId);
+    if (requestSequence !== remedialRequestSequence) return;
+
+    if (result.available) {
+        remedialStatus.textContent = result.cached
+            ? "저장된 AI 추가 문제 2개를 다시 풀어보세요."
+            : "AI 추가 문제 2개가 준비됐어요.";
+        remedialStartBtn.disabled = false;
+        return;
+    }
+
+    remedialStatus.textContent = result.message;
+    remedialStartBtn.disabled = true;
 }
 
 // 보기 클릭
@@ -347,6 +376,8 @@ options.forEach((button, index) => {
                 correctAnswer.textContent = result.correct_answer;
                 updateWrongProgress();
                 showWrong();
+                // 오답 화면과 게임 진행을 막지 않고 Gemini 추가 문제를 별도로 준비한다.
+                prepareRemedialQuestions(question.question_id);
             }
         } catch (error) {
             console.error(error);
@@ -421,6 +452,10 @@ retryStageBtn.addEventListener("click", () => {
 // 다음 단계로 (다음 문제 또는 결과 제출)
 nextStageBtn.addEventListener("click", () => {
     advance();
+});
+
+remedialStartBtn.addEventListener("click", () => {
+    RemedialQuiz.open();
 });
 
 // 스테이지 클릭
