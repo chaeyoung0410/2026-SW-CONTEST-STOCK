@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field
 
 
 class LearningPageResponse(BaseModel):
@@ -26,6 +26,7 @@ class RecommendationResponse(LearningResponse):
     recommendation_reason: str
     weak_topic: str
     current_accuracy: float | None = Field(default=None, ge=0, le=100)
+    wrong_rate: float = Field(ge=0, le=100)
     total_attempts: int = Field(ge=0)
     correct_count: int = Field(ge=0)
     wrong_count: int = Field(ge=0)
@@ -33,18 +34,7 @@ class RecommendationResponse(LearningResponse):
     recently_recommended: bool
 
 
-class RecommendationFeedbackRequest(BaseModel):
-    clicked: bool | None = None
-    learning_completed: bool | None = None
-
-    @model_validator(mode="after")
-    def require_update(self) -> "RecommendationFeedbackRequest":
-        if self.clicked is None and self.learning_completed is None:
-            raise ValueError("clicked or learning_completed is required")
-        return self
-
-
-class RecommendationFeedbackResponse(BaseModel):
+class RecommendationInteractionState(BaseModel):
     recommendation_id: int
     clicked: bool
     clicked_at: datetime | None
@@ -54,6 +44,6 @@ class RecommendationFeedbackResponse(BaseModel):
     completed_at: datetime | None
 
 
-class RecommendationInteractionResponse(RecommendationFeedbackResponse):
+class RecommendationInteractionResponse(RecommendationInteractionState):
     interaction: str
     already_applied: bool

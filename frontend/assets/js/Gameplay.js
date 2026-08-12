@@ -90,7 +90,6 @@ let lastConceptTag = "";
 let currentSubmissionId = null;
 let currentAnswerAttemptIds = [];
 let currentResultSubmissionId = null;
-let currentRecommendationId = null;
 
 function createSubmissionId() {
     return window.crypto?.randomUUID
@@ -206,30 +205,9 @@ async function loadStages() {
 
         moveCharacter(furthestCleared > 0 ? furthestCleared : "start");
 
-        const recommendedStageId = Number(sessionStorage.getItem("recommendedStageId"));
-        const recommendedRecommendationId = Number(
-            sessionStorage.getItem("recommendedRecommendationId")
-        );
-        if (recommendedStageId) {
-            sessionStorage.removeItem("recommendedStageId");
-            sessionStorage.removeItem("recommendedRecommendationId");
-            const recommendedStage = stagesInfo.find((stage) => stage.stage_id === recommendedStageId);
-            if (recommendedStage && !recommendedStage.locked) {
-                currentRecommendationId = recommendedRecommendationId || null;
-                if (currentRecommendationId) {
-                    try {
-                        await apiFetch(
-                            `/learning/recommendations/${currentRecommendationId}/start`,
-                            { method: "POST" }
-                        );
-                    } catch (error) {
-                        // 시작 이력 실패가 퀴즈 진입 자체를 막지는 않는다.
-                        console.error(error);
-                    }
-                }
-                startStage(recommendedStageId, recommendedStage.title);
-            }
-        }
+        // 이전 버전의 AI 추천 → 일반 게임 이동 상태가 남아 있어도 사용하지 않는다.
+        sessionStorage.removeItem("recommendedStageId");
+        sessionStorage.removeItem("recommendedRecommendationId");
     } catch (error) {
         console.error(error);
     }
@@ -374,14 +352,12 @@ async function advance() {
                 total_question: currentQuestions.length,
                 answer_attempt_ids: currentAnswerAttemptIds,
                 submission_id: currentResultSubmissionId,
-                recommendation_id: currentRecommendationId,
             }),
         });
 
         const result = await response.json();
 
         if (response.ok) {
-            currentRecommendationId = null;
             moveCharacter(currentStageId);
             await loadBuilding();
             await loadStages();
@@ -434,7 +410,6 @@ stages.forEach((stageEl) => {
             return;
         }
 
-        currentRecommendationId = null;
         startStage(stageNum, info ? info.title : `Stage ${stageNum}`);
     });
 });
