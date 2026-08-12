@@ -112,14 +112,12 @@
 
 /* start */
 .player_character.start {
-    width: 450px;
-    height: 350px;
+    width: 370px;
 }
 
 /* 스테이지 */
 .player_character.stage {
-    width: 250px;
-    height: 200px;
+    width: 180px;
 }
 
 /* ============================================================ */
@@ -671,8 +669,8 @@
 
 /* 캐릭터 */
 .wrong_character {
-    width: 200px;
-    margin-top: -40px;
+    width: 290px;
+    margin-top: -42px;
 }
 
 .wrong_character img {

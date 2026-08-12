@@ -411,3 +411,16 @@ body {
   background: linear-gradient(90deg, #7c5cfc, #5b3ce0);
   color: #ffffff;
 }
+
+.profile-image {
+    position: absolute;
+
+    left: 10%;
+    top: 21%;
+
+    width: 27%;
+
+    object-fit: cover;
+
+    z-index: 10;
+}
