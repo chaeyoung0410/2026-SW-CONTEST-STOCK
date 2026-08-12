@@ -6,29 +6,20 @@
 
 body{
     height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:#e9e3e3;
     font-family:"Pretendard", sans-serif;
 }
 
 .final-card{
-
     width:580px;
     height:760px;
-
     position:relative;
-
     border-radius:30px;
-
     overflow:hidden;
-
     background-image:url("../img/final.png");
     background-size:cover;
     background-position:center;
     background-repeat:no-repeat;
-
+    margin: 40px auto 0;
 }
 
 
