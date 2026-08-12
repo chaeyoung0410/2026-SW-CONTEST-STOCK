@@ -5,28 +5,38 @@
 }
 
 body {
-  background: #0a0a1f;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  margin: 0;
+  min-width: 320px;
   min-height: 100vh;
+
+  background: #0a0a1f;
+
   font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
 }
 
 .screen {
   position: relative;
+
   width: 100%;
-  max-width: 1535px;
-  aspect-ratio: 1535 / 1024;
+  max-width: 1536px;
+  aspect-ratio: 1536 / 1024;
+  container-type: inline-size;
+
+  margin: 0 auto;
+
   background-image: url("../img/mypage.png");
-  background-size: cover;
+  background-size: 100% 100%;
   background-position: center;
+  background-repeat: no-repeat;
+
   overflow: hidden;
 }
 
-@media (max-width: 1535px) {
-  .screen { width: 100vw; }
-}
+/* @media (max-width: 1535px) {
+  .screen {
+    width: 100vw;
+  }
+} */
 
 /* 상단 아이콘 버튼 */
 
@@ -53,7 +63,9 @@ body {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
 }
 
-.back-btn { left: 2.08%; }
+.back-btn {
+  left: 2.08%;
+}
 
 
 /*  프로필 카드  */
@@ -76,7 +88,7 @@ body {
   display: flex;
   align-items: center;
   color: #ffffff;
-  font-size: clamp(16px, 1.9vw, 28px);
+  font-size: 1.82cqw;
   font-weight: 700;
 }
 
@@ -100,8 +112,13 @@ body {
   background: rgba(255, 255, 255, 0.1);
 }
 
-#editIdBtn { top: 28%; }
-#logoutBtn { top: 60%; }
+#editIdBtn {
+  top: 28%;
+}
+
+#logoutBtn {
+  top: 60%;
+}
 
 .row-left {
   display: flex;
@@ -112,20 +129,20 @@ body {
 }
 
 .row-icon {
-  width: clamp(28px, 2.6vw, 42px);
-  height: clamp(28px, 2.6vw, 42px);
+  width: 2.73cqw;
+  height: 2.73cqw;
   object-fit: contain;
   flex-shrink: 0;
 }
 
 .logout-icon {
-  width: clamp(30px, 2.9vw, 46px);
-  height: clamp(30px, 2.9vw, 46px);
+  width: 2.99cqw;
+  height: 2.99cqw;
 }
 
 .row-text {
   color: #f2eefc;
-  font-size: clamp(13px, 1.5vw, 22px);
+  font-size: 1.43cqw;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -133,8 +150,8 @@ body {
 }
 
 .row-chevron {
-  width: clamp(14px, 1.2vw, 20px);
-  height: clamp(14px, 1.2vw, 20px);
+  width: 1.3cqw;
+  height: 1.3cqw;
   opacity: 0.8;
   flex-shrink: 0;
 }
@@ -144,7 +161,7 @@ body {
 .ad-card {
   position: absolute;
   left: 13.16%;
-  top: 54.69%;
+  top: 50%;
   width: 70.75%;
   height: 41.60%;
 }
@@ -152,13 +169,13 @@ body {
 .ad-label {
   position: absolute;
   left: 3.31%;
-  top: 7.04%;
-  font-size: clamp(16px, 1.7vw, 24px);
+  top: 11%;
+  font-size: 1.56cqw;
   font-weight: 700;
   color: #3d2e85;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.39cqw;
 }
 
 .sparkle {
@@ -171,14 +188,15 @@ body {
   top: 21.13%;
   width: 94.47%;
   height: 71.83%;
-  border-radius: 24px;
+  border-radius: 1.56cqw;
   background: rgba(255, 255, 255, 0.55);
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
   overflow-y: auto;
-  padding: 4px 0;
+  padding: 0.26cqw 0;
+  scrollbar-width: none;
 }
 
 .ad-placeholder img {
@@ -190,16 +208,16 @@ body {
 .news-empty {
   margin: auto;
   color: #7a72a8;
-  font-size: 14px;
+  font-size: 0.91cqw;
 }
 
 .news-item {
   display: block;
-  padding: 10px 14px;
+  padding: 0.65cqw 0.91cqw;
   border-bottom: 1px solid rgba(61, 46, 133, 0.12);
   color: #3d2e85;
   text-decoration: none;
-  font-size: clamp(13px, 1.3vw, 15px);
+  font-size: 0.98cqw;
   font-weight: 600;
   line-height: 1.4;
 }
@@ -214,14 +232,14 @@ body {
 
 .news-item .news-date {
   display: block;
-  margin-top: 3px;
-  font-size: 12px;
+  margin-top: 0.2cqw;
+  font-size: 0.78cqw;
   font-weight: 400;
   color: #9088b8;
 }
 
 /*  아이디 수정 팝업  */
- 
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -232,11 +250,11 @@ body {
   z-index: 100;
   padding: 20px;
 }
- 
+
 .modal-overlay.is-open {
   display: flex;
 }
- 
+
 .modal-box {
   width: 100%;
   max-width: 460px;
@@ -246,19 +264,26 @@ body {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
   animation: modal-pop 0.18s ease;
 }
- 
+
 @keyframes modal-pop {
-  from { transform: scale(0.96); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
- 
+
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 14px;
 }
- 
+
 .modal-title {
   display: flex;
   align-items: center;
@@ -267,12 +292,12 @@ body {
   font-weight: 800;
   color: #241c4f;
 }
- 
+
 .modal-title .sparkle {
   font-size: 0.85em;
   color: #8b5cf6;
 }
- 
+
 .modal-close {
   width: 34px;
   height: 34px;
@@ -287,18 +312,18 @@ body {
   justify-content: center;
   transition: background 0.15s ease;
 }
- 
+
 .modal-close:hover {
   background: #d5cbf7;
 }
- 
+
 .modal-subtitle {
   text-align: center;
   color: #6b6483;
   font-size: 14.5px;
   margin-bottom: 22px;
 }
- 
+
 .modal-label {
   display: block;
   font-size: 14px;
@@ -306,13 +331,13 @@ body {
   color: #241c4f;
   margin-bottom: 8px;
 }
- 
+
 .modal-input-wrap {
   position: relative;
   margin-bottom: 12px;
 }
 
- 
+
 .modal-input {
   width: 100%;
   height: 52px;
@@ -325,15 +350,15 @@ body {
   outline: none;
   transition: border-color 0.15s ease;
 }
- 
+
 .modal-input:focus {
   border-color: #8b5cf6;
 }
- 
+
 .modal-input::placeholder {
   color: #b3acc9;
 }
- 
+
 .char-count {
   position: absolute;
   right: 16px;
@@ -343,7 +368,7 @@ body {
   color: #a29bbd;
   pointer-events: none;
 }
- 
+
 .modal-hint {
   display: flex;
   align-items: center;
@@ -352,17 +377,17 @@ body {
   color: #8a83a3;
   margin-bottom: 26px;
 }
- 
+
 .hint-icon {
   font-size: 13px;
   color: #a29bbd;
 }
- 
+
 .modal-actions {
   display: flex;
   gap: 12px;
 }
- 
+
 .modal-btn {
   flex: 1;
   height: 52px;
@@ -373,18 +398,17 @@ body {
   cursor: pointer;
   transition: opacity 0.15s ease;
 }
- 
+
 .modal-btn:hover {
   opacity: 0.9;
 }
- 
+
 .modal-btn-cancel {
   background: #dcd5f4;
   color: #5b4fa0;
 }
- 
+
 .modal-btn-confirm {
   background: linear-gradient(90deg, #7c5cfc, #5b3ce0);
   color: #ffffff;
 }
-

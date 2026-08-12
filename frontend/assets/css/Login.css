@@ -220,6 +220,7 @@ button {
 
     font-size: 18px;
     font-weight: 800;
+    cursor: pointer;
 
     transition:
         transform 0.15s,
