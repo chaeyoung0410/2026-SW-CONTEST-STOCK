@@ -50,7 +50,7 @@ function renderRecommendation(slot, item) {
 
 async function loadRecommendations() {
     try {
-        const response = await apiFetch("/learning/recommend?limit=4");
+        const response = await apiFetch("/learning/recommend");
         if (!response.ok) return;
 
         const items = await response.json();

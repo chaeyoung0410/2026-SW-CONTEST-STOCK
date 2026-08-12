@@ -196,12 +196,6 @@ def save_result(
         progress.score = max(progress.score, score)
         progress.accuracy = max(progress.accuracy, accuracy)
 
-    db.add(result)
-    db.add(history)
-    db.flush()
-    building_state = get_building_state(db, user_id)
-    level = building_state["level"]
-    db.commit()
     try:
         db.add(result)
         db.add(history)
