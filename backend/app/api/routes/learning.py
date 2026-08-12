@@ -6,16 +6,22 @@ from app.db.session import get_db
 from app.models.user import User
 from app.schemas.learning import (
     LearningResponse,
-    RecommendationFeedbackRequest,
-    RecommendationFeedbackResponse,
     RecommendationInteractionResponse,
     RecommendationResponse,
+)
+from app.schemas.recommendation_quiz import (
+    RecommendationQuizCompletionRequest,
+    RecommendationQuizCompletionResponse,
+    RecommendationQuizResponse,
 )
 from app.services.learning_service import get_learning
 from app.services.recommend_service import (
     get_recommendations,
     record_recommendation_interaction,
-    update_recommendation_feedback,
+)
+from app.services.recommendation_quiz_service import (
+    complete_recommendation_quiz,
+    generate_quiz_for_recommendation,
 )
 
 router = APIRouter(tags=["Learning"])
@@ -30,32 +36,35 @@ def get_recommended_learning(
     return get_recommendations(db, current_user.user_id, limit=limit)
 
 
-@router.patch(
-    "/learning/recommendations/{recommendation_id}",
-    response_model=RecommendationFeedbackResponse,
+@router.post(
+    "/learning/recommendations/{recommendation_id}/quiz",
+    response_model=RecommendationQuizResponse,
 )
-def update_recommendation(
+def generate_recommendation_quiz_questions(
     recommendation_id: int,
-    request: RecommendationFeedbackRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> dict:
-    history = update_recommendation_feedback(
+    return generate_quiz_for_recommendation(db, current_user.user_id, recommendation_id)
+
+
+@router.post(
+    "/learning/recommendations/{recommendation_id}/quiz/complete",
+    response_model=RecommendationQuizCompletionResponse,
+)
+def submit_recommendation_quiz_result(
+    recommendation_id: int,
+    request: RecommendationQuizCompletionRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    return complete_recommendation_quiz(
         db,
         current_user.user_id,
         recommendation_id,
-        request.clicked,
-        request.learning_completed,
+        request.correct_count,
+        request.total_questions,
     )
-    return {
-        "recommendation_id": history.recommendation_id,
-        "clicked": history.clicked,
-        "clicked_at": history.clicked_at,
-        "learning_started": history.learning_started,
-        "started_at": history.started_at,
-        "learning_completed": history.learning_completed,
-        "completed_at": history.completed_at,
-    }
 
 
 def _record_interaction(
@@ -106,18 +115,6 @@ def start_recommendation(
     current_user: User = Depends(get_current_user),
 ) -> dict:
     return _record_interaction("start", recommendation_id, db, current_user)
-
-
-@router.post(
-    "/learning/recommendations/{recommendation_id}/complete",
-    response_model=RecommendationInteractionResponse,
-)
-def complete_recommendation(
-    recommendation_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-) -> dict:
-    return _record_interaction("complete", recommendation_id, db, current_user)
 
 
 @router.get("/learning/{stage_id}", response_model=LearningResponse)

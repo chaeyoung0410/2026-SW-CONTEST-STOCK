@@ -59,9 +59,6 @@ const conceptBtn = document.getElementById("conceptBtn");
 const buildingProgressBar = document.getElementById("buildingProgressBar");
 const buildingProgressText = document.getElementById("buildingProgressText");
 const selectedAnswerText = document.getElementById("selectedAnswer");
-const remedialPrompt = document.getElementById("remedialPrompt");
-const remedialStatus = document.getElementById("remedialStatus");
-const remedialStartBtn = document.getElementById("remedialStartBtn");
 
 const wrongBuildingProgressBar = document.getElementById("wrongBuildingProgressBar");
 const wrongBuildingProgressText = document.getElementById("wrongBuildingProgressText");
@@ -93,8 +90,6 @@ let lastConceptTag = "";
 let currentSubmissionId = null;
 let currentAnswerAttemptIds = [];
 let currentResultSubmissionId = null;
-let currentRecommendationId = null;
-let remedialRequestSequence = 0;
 
 function createSubmissionId() {
     return window.crypto?.randomUUID
@@ -210,30 +205,9 @@ async function loadStages() {
 
         moveCharacter(furthestCleared > 0 ? furthestCleared : "start");
 
-        const recommendedStageId = Number(sessionStorage.getItem("recommendedStageId"));
-        const recommendedRecommendationId = Number(
-            sessionStorage.getItem("recommendedRecommendationId")
-        );
-        if (recommendedStageId) {
-            sessionStorage.removeItem("recommendedStageId");
-            sessionStorage.removeItem("recommendedRecommendationId");
-            const recommendedStage = stagesInfo.find((stage) => stage.stage_id === recommendedStageId);
-            if (recommendedStage && !recommendedStage.locked) {
-                currentRecommendationId = recommendedRecommendationId || null;
-                if (currentRecommendationId) {
-                    try {
-                        await apiFetch(
-                            `/learning/recommendations/${currentRecommendationId}/start`,
-                            { method: "POST" }
-                        );
-                    } catch (error) {
-                        // 시작 이력 실패가 퀴즈 진입 자체를 막지는 않는다.
-                        console.error(error);
-                    }
-                }
-                startStage(recommendedStageId, recommendedStage.title);
-            }
-        }
+        // 이전 버전의 AI 추천 → 일반 게임 이동 상태가 남아 있어도 사용하지 않는다.
+        sessionStorage.removeItem("recommendedStageId");
+        sessionStorage.removeItem("recommendedRecommendationId");
     } catch (error) {
         console.error(error);
     }
@@ -295,10 +269,6 @@ async function startStage(stageId, stageTitle) {
 function loadQuestion() {
     const question = currentQuestions[currentQuestionIndex];
     currentSubmissionId = createSubmissionId();
-    remedialRequestSequence += 1;
-    RemedialQuiz.reset();
-    remedialPrompt.hidden = true;
-    remedialStartBtn.disabled = true;
 
     quizQuestion.textContent = question.question;
     options.forEach((btn, index) => {
@@ -309,27 +279,6 @@ function loadQuestion() {
     progressBar.style.width = `${((currentQuestionIndex + 1) / currentQuestions.length) * 100}%`;
 
     showQuiz();
-}
-
-async function prepareRemedialQuestions(questionId) {
-    const requestSequence = ++remedialRequestSequence;
-    remedialPrompt.hidden = false;
-    remedialStatus.textContent = "AI가 오답에 맞는 추가 문제를 만들고 있어요...";
-    remedialStartBtn.disabled = true;
-
-    const result = await RemedialQuiz.prepare(questionId);
-    if (requestSequence !== remedialRequestSequence) return;
-
-    if (result.available) {
-        remedialStatus.textContent = result.cached
-            ? "저장된 AI 추가 문제 2개를 다시 풀어보세요."
-            : "AI 추가 문제 2개가 준비됐어요.";
-        remedialStartBtn.disabled = false;
-        return;
-    }
-
-    remedialStatus.textContent = result.message;
-    remedialStartBtn.disabled = true;
 }
 
 // 보기 클릭
@@ -376,8 +325,6 @@ options.forEach((button, index) => {
                 correctAnswer.textContent = result.correct_answer;
                 updateWrongProgress();
                 showWrong();
-                // 오답 화면과 게임 진행을 막지 않고 Gemini 추가 문제를 별도로 준비한다.
-                prepareRemedialQuestions(question.question_id);
             }
         } catch (error) {
             console.error(error);
@@ -405,14 +352,12 @@ async function advance() {
                 total_question: currentQuestions.length,
                 answer_attempt_ids: currentAnswerAttemptIds,
                 submission_id: currentResultSubmissionId,
-                recommendation_id: currentRecommendationId,
             }),
         });
 
         const result = await response.json();
 
         if (response.ok) {
-            currentRecommendationId = null;
             moveCharacter(currentStageId);
             await loadBuilding();
             await loadStages();
@@ -454,10 +399,6 @@ nextStageBtn.addEventListener("click", () => {
     advance();
 });
 
-remedialStartBtn.addEventListener("click", () => {
-    RemedialQuiz.open();
-});
-
 // 스테이지 클릭
 stages.forEach((stageEl) => {
     stageEl.addEventListener("click", () => {
@@ -469,7 +410,6 @@ stages.forEach((stageEl) => {
             return;
         }
 
-        currentRecommendationId = null;
         startStage(stageNum, info ? info.title : `Stage ${stageNum}`);
     });
 });

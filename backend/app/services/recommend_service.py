@@ -14,10 +14,8 @@ from app.models.result import Result
 from app.models.stage import Stage
 from app.models.user import User
 from app.models.wrong_answer import WrongAnswer
-from app.services.recommendation_scoring import RecommendationSignals, calculate_recommendation_score
 
 DEFAULT_RECOMMENDATION_LIMIT = 4
-RECENT_RECOMMENDATION_DAYS = 7
 
 
 @dataclass
@@ -33,6 +31,12 @@ class TopicStats:
             return None
         return round((self.correct_count / self.total_attempts) * 100, 2)
 
+    @property
+    def wrong_rate(self) -> float:
+        if self.total_attempts == 0:
+            return 0.0
+        return round((self.wrong_count / self.total_attempts) * 100, 2)
+
 
 @dataclass(frozen=True)
 class RecommendationInteractionResult:
@@ -47,7 +51,7 @@ def get_recommendations(
     limit: int = DEFAULT_RECOMMENDATION_LIMIT,
     now: datetime | None = None,
 ) -> list[dict]:
-    """취약도 점수를 계산하고 추천 노출 이력까지 원자적으로 저장한다."""
+    """누적 오답률 상위 주제를 반환하고 추천 노출 이력을 저장한다."""
     if db.get(User, user_id) is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     if not 1 <= limit <= 10:
@@ -64,69 +68,53 @@ def get_recommendations(
     candidates = [stage for stage in stages if stage.stage_id <= current_stage_id]
     learning_by_stage = _get_learning_by_stage(db, candidates)
     topics = _get_topics(db, candidates)
-    history_by_stage, last_top_stage_id = _get_recent_history(db, user_id)
-    latest_result_by_stage = _get_latest_results_by_stage(db, user_id)
-    is_default_recommendation = not any(
-        item.total_attempts > 0 for item in stats.values()
-    )
+    history_by_stage = _get_recent_history(db, user_id)
 
     ranked: list[dict] = []
     for stage in candidates:
         stage_stats = stats.get(stage.stage_id, TopicStats())
-        histories = history_by_stage.get(stage.stage_id, [])
-        last_recommendation = histories[0] if histories else None
-        last_completion = next((item for item in histories if item.learning_completed), None)
-        days_since_wrong = _days_since(now, stage_stats.last_wrong_at)
-        days_since_recommendation = _days_since(
-            now, last_recommendation.recommended_at if last_recommendation else None
-        )
-        days_since_completion = _days_since(
-            now, last_completion.completed_at if last_completion else None
-        )
+        if stage_stats.wrong_count == 0:
+            continue
 
-        breakdown = calculate_recommendation_score(
-            RecommendationSignals(
-                wrong_count=stage_stats.wrong_count,
-                total_attempts=stage_stats.total_attempts,
-                accuracy=stage_stats.accuracy,
-                difficulty=stage.difficulty,
-                progress_distance=abs(current_stage_id - stage.stage_id),
-                days_since_last_wrong=days_since_wrong,
-                days_since_last_recommendation=days_since_recommendation,
-                days_since_completion=days_since_completion,
-                was_last_top_recommendation=stage.stage_id == last_top_stage_id,
+        histories = history_by_stage.get(stage.stage_id, [])
+        last_completion = next((item for item in histories if item.learning_completed), None)
+        # 완료 이후 새 오답이 생긴 경우에만 같은 주제를 다시 후보에 올린다.
+        if (
+            last_completion is not None
+            and last_completion.completed_at is not None
+            and (
+                stage_stats.last_wrong_at is None
+                or _as_utc(stage_stats.last_wrong_at)
+                <= _as_utc(last_completion.completed_at)
             )
-        )
+        ):
+            continue
+
         pages = learning_by_stage.get(stage.stage_id, [])
         topic = topics.get(stage.stage_id, stage.title)
-        reason = _build_reason(stage_stats, topic, days_since_wrong, last_completion is not None)
+        reason = (
+            f"{topic} 누적 {stage_stats.total_attempts}회 풀이 중 "
+            f"{stage_stats.wrong_count}회 오답으로 오답률 {stage_stats.wrong_rate:.0f}%입니다."
+        )
         ranked.append(
             {
                 "stage": stage,
                 "pages": pages,
                 "topic": topic,
                 "stats": stage_stats,
-                "score": breakdown.total,
+                "score": stage_stats.wrong_rate,
                 "reason": reason,
-                "recently_recommended": (
-                    days_since_recommendation is not None
-                    and days_since_recommendation <= RECENT_RECOMMENDATION_DAYS
-                ),
+                "recently_recommended": bool(histories),
             }
         )
 
-    ranked.sort(key=lambda item: (-item["score"], item["stage"].stage_id))
-    # A penalty alone cannot guarantee rotation when one topic is much weaker.
-    # Keep the previous top eligible, but place one alternative ahead whenever
-    # at least two accessible candidates exist.
-    if (
-        len(ranked) > 1
-        and last_top_stage_id is not None
-        and ranked[0]["stage"].stage_id == last_top_stage_id
-    ):
-        previous_top = ranked.pop(0)
-        previous_top["score"] = round(max(0.0, ranked[0]["score"] - 0.01), 2)
-        ranked.insert(1, previous_top)
+    ranked.sort(
+        key=lambda item: (
+            -item["stats"].wrong_rate,
+            -item["stats"].wrong_count,
+            item["stage"].stage_id,
+        )
+    )
     selected = ranked[:limit]
 
     try:
@@ -136,18 +124,6 @@ def get_recommendations(
             pages = item["pages"]
             stage_stats = item["stats"]
             learning_id = pages[0].learning_id if pages else None
-            baseline_result = latest_result_by_stage.get(stage.stage_id)
-            baseline_total = baseline_result.total_question if baseline_result else 0
-            baseline_correct = (
-                min(max(baseline_result.correct_count, 0), baseline_total)
-                if baseline_result and baseline_total > 0
-                else 0
-            )
-            baseline_accuracy = (
-                round((baseline_correct / baseline_total) * 100, 2)
-                if baseline_total > 0
-                else None
-            )
             history = RecommendationHistory(
                 user_id=user_id,
                 stage_id=stage.stage_id,
@@ -156,14 +132,10 @@ def get_recommendations(
                 recommendation_score=item["score"],
                 reason=item["reason"],
                 recommended_at=now,
-                baseline_accuracy=baseline_accuracy,
-                baseline_score=(baseline_result.score if baseline_result else None),
-                baseline_wrong_count=(
-                    baseline_total - baseline_correct
-                    if baseline_total > 0
-                    else None
-                ),
-                is_default_recommendation=is_default_recommendation,
+                baseline_accuracy=stage_stats.accuracy,
+                baseline_score=stage_stats.correct_count * 10,
+                baseline_wrong_count=stage_stats.wrong_count,
+                is_default_recommendation=False,
             )
             db.add(history)
             db.flush()
@@ -180,6 +152,7 @@ def get_recommendations(
                     "recommendation_reason": item["reason"],
                     "weak_topic": item["topic"],
                     "current_accuracy": stage_stats.accuracy,
+                    "wrong_rate": stage_stats.wrong_rate,
                     "total_attempts": stage_stats.total_attempts,
                     "correct_count": stage_stats.correct_count,
                     "wrong_count": stage_stats.wrong_count,
@@ -194,40 +167,6 @@ def get_recommendations(
         raise
 
 
-def update_recommendation_feedback(
-    db: Session,
-    user_id: int,
-    recommendation_id: int,
-    clicked: bool | None,
-    learning_completed: bool | None,
-    now: datetime | None = None,
-) -> RecommendationHistory:
-    history = _get_owned_recommendation(db, user_id, recommendation_id)
-    updated_at = _as_utc(now or datetime.now(timezone.utc))
-
-    if clicked is not None and not (history.learning_completed and not clicked):
-        history.clicked = clicked
-        history.clicked_at = updated_at if clicked else None
-    if learning_completed:
-        if not history.learning_completed:
-            history.learning_completed = True
-            history.completed_at = updated_at
-        if not history.learning_started:
-            history.learning_started = True
-            history.started_at = updated_at
-        if not history.clicked:
-            history.clicked = True
-            history.clicked_at = updated_at
-
-    try:
-        db.commit()
-        db.refresh(history)
-        return history
-    except Exception:
-        db.rollback()
-        raise
-
-
 def record_recommendation_interaction(
     db: Session,
     user_id: int,
@@ -235,26 +174,22 @@ def record_recommendation_interaction(
     interaction: str,
     now: datetime | None = None,
 ) -> RecommendationInteractionResult:
-    if interaction not in {"click", "start", "complete"}:
+    if interaction not in {"click", "start"}:
         raise ValueError("Unsupported recommendation interaction")
     history = _get_owned_recommendation(db, user_id, recommendation_id)
     updated_at = _as_utc(now or datetime.now(timezone.utc))
     already_applied = {
         "click": history.clicked,
         "start": history.learning_started,
-        "complete": history.learning_completed,
     }[interaction]
 
     if not already_applied:
         if not history.clicked:
             history.clicked = True
             history.clicked_at = updated_at
-        if interaction in {"start", "complete"} and not history.learning_started:
+        if interaction == "start" and not history.learning_started:
             history.learning_started = True
             history.started_at = updated_at
-        if interaction == "complete" and not history.learning_completed:
-            history.learning_completed = True
-            history.completed_at = updated_at
 
     try:
         db.commit()
@@ -332,6 +267,8 @@ def _collect_topic_stats(db: Session, user_id: int) -> dict[int, TopicStats]:
         item.total_attempts += result.total_question
         item.correct_count += correct_count
         item.wrong_count += result.total_question - correct_count
+        if result.total_question - correct_count > 0:
+            item.last_wrong_at = _latest(item.last_wrong_at, result.created_at)
 
     legacy_wrong_answers = list(db.scalars(select(WrongAnswer).where(WrongAnswer.user_id == user_id)))
     for wrong in legacy_wrong_answers:
@@ -378,20 +315,6 @@ def _get_learning_by_stage(db: Session, stages: list[Stage]) -> dict[int, list[L
     return grouped
 
 
-def _get_latest_results_by_stage(db: Session, user_id: int) -> dict[int, Result]:
-    rows = list(
-        db.scalars(
-            select(Result)
-            .where(Result.user_id == user_id)
-            .order_by(Result.created_at.desc(), Result.result_id.desc())
-        )
-    )
-    latest: dict[int, Result] = {}
-    for result in rows:
-        latest.setdefault(result.stage_id, result)
-    return latest
-
-
 def _get_topics(db: Session, stages: list[Stage]) -> dict[int, str]:
     stage_ids = [stage.stage_id for stage in stages]
     if not stage_ids:
@@ -405,7 +328,7 @@ def _get_topics(db: Session, stages: list[Stage]) -> dict[int, str]:
 
 def _get_recent_history(
     db: Session, user_id: int
-) -> tuple[dict[int, list[RecommendationHistory]], int | None]:
+) -> dict[int, list[RecommendationHistory]]:
     histories = list(
         db.scalars(
             select(RecommendationHistory)
@@ -416,33 +339,7 @@ def _get_recent_history(
     grouped: dict[int, list[RecommendationHistory]] = {}
     for history in histories:
         grouped.setdefault(history.stage_id, []).append(history)
-    last_top = next((item.stage_id for item in histories if item.priority == 1), None)
-    return grouped, last_top
-
-
-def _build_reason(
-    stats: TopicStats,
-    topic: str,
-    days_since_wrong: float | None,
-    was_completed: bool,
-) -> str:
-    if stats.total_attempts == 0:
-        return f"아직 풀이 기록이 없어 현재 진도에 맞는 {topic} 입문 학습을 추천합니다."
-    if stats.wrong_count and days_since_wrong is not None and days_since_wrong <= 7:
-        return f"최근 {topic} 문제에서 {stats.wrong_count}회 오답이 발생해 복습이 필요합니다."
-    if stats.accuracy is not None and stats.accuracy < 60:
-        return f"현재 {topic} 정답률이 {stats.accuracy:.0f}%로 낮아 우선 학습을 추천합니다."
-    if stats.wrong_count:
-        suffix = " 최근 학습을 완료했지만 취약도가 남아 다시 추천합니다." if was_completed else ""
-        return f"{topic} 문제에서 누적 {stats.wrong_count}회 오답이 확인되었습니다.{suffix}".strip()
-    return f"현재 학습 진도와 가까운 {topic} 개념을 다음 학습으로 추천합니다."
-
-
-def _days_since(now: datetime, value: datetime | None) -> float | None:
-    if value is None:
-        return None
-    seconds = (now - _as_utc(value)).total_seconds()
-    return max(0.0, seconds / 86400)
+    return grouped
 
 
 def _latest(current: datetime | None, candidate: datetime) -> datetime:

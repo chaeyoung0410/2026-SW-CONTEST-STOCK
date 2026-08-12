@@ -28,6 +28,7 @@ const todaySlot = document.querySelector('[data-slot="today-recommendation"]');
 const todayCard = document.querySelector(".today-card");
 const listCard = document.querySelector(".list-card");
 const listRows = document.querySelectorAll(".list-row");
+let recommendations = [];
 
 function renderRecommendation(slot, item) {
     slot.innerHTML = "";
@@ -39,7 +40,7 @@ function renderRecommendation(slot, item) {
 
     const desc = document.createElement("p");
     desc.className = "rec-desc";
-    desc.textContent = item.content || "곧 학습 콘텐츠가 추가될 예정이에요.";
+    desc.textContent = `누적 오답률 ${item.wrong_rate}% · 오답 ${item.wrong_count}회 / 총 ${item.total_attempts}회`;
     slot.appendChild(desc);
 
     const reason = document.createElement("p");
@@ -54,26 +55,28 @@ async function loadRecommendations() {
         if (!response.ok) return;
 
         const items = await response.json();
+        recommendations = items;
+
+        const todayButton = todayCard.querySelector('[data-action="start-today"]');
+        todayCard.style.display = "";
+        todayButton.style.display = "";
+        listCard.style.display = "";
+        listRows.forEach((row) => { row.style.display = ""; });
 
         if (!items.length) {
             todaySlot.textContent = "아직 추천할 학습이 없어요. 문제를 풀어보세요!";
-            if (todayCard) {
-                const startBtn = todayCard.querySelector('[data-action="start-today"]');
-                if (startBtn) startBtn.style.display = "none";
-            }
+            todayButton.style.display = "none";
             if (listCard) listCard.style.display = "none";
             return;
         }
 
         renderRecommendation(todaySlot, items[0]);
-        if (todayCard) todayCard.dataset.stageId = items[0].stage_id;
-        if (todayCard) todayCard.dataset.recommendationId = items[0].recommendation_id;
+        todayCard.dataset.recommendationIndex = "0";
 
         const restItems = items.slice(1);
         listRows.forEach((row, index) => {
             const item = restItems[index];
             const slot = row.querySelector(".card-content");
-            const btn = row.querySelector('[data-action="start-item"]');
 
             if (!item) {
                 row.style.display = "none";
@@ -82,9 +85,7 @@ async function loadRecommendations() {
 
             row.style.display = "";
             renderRecommendation(slot, item);
-            if (btn) btn.dataset.stageId = item.stage_id;
-            row.dataset.stageId = item.stage_id;
-            row.dataset.recommendationId = item.recommendation_id;
+            row.dataset.recommendationIndex = String(index + 1);
         });
 
         if (!restItems.length && listCard) {
@@ -98,26 +99,10 @@ async function loadRecommendations() {
 loadRecommendations();
 
 async function startRecommendation(container) {
-    const stageId = Number(container?.dataset.stageId);
-    const recommendationId = Number(container?.dataset.recommendationId);
-    if (!stageId) return;
-
-    if (recommendationId) {
-        try {
-            await apiFetch(`/learning/recommendations/${recommendationId}/click`, {
-                method: "POST",
-            });
-        } catch (error) {
-            // 클릭 이력 저장 실패가 학습 시작 자체를 막지는 않는다.
-            console.error(error);
-        }
-    }
-
-    sessionStorage.setItem("recommendedStageId", String(stageId));
-    if (recommendationId) {
-        sessionStorage.setItem("recommendedRecommendationId", String(recommendationId));
-    }
-    smoothNavigate("./Gameplay.html");
+    const index = Number(container?.dataset.recommendationIndex);
+    const item = recommendations[index];
+    if (!item) return;
+    RecommendationQuiz.open(item);
 }
 
 document.querySelector('[data-action="start-today"]').addEventListener("click", () => {
@@ -126,6 +111,10 @@ document.querySelector('[data-action="start-today"]').addEventListener("click", 
 
 document.querySelectorAll('[data-action="start-item"]').forEach((button) => {
     button.addEventListener("click", () => startRecommendation(button.closest(".list-row")));
+});
+
+document.addEventListener("recommendation-quiz:finished", (event) => {
+    if (event.detail?.passed) loadRecommendations();
 });
 
 //뒤로가기

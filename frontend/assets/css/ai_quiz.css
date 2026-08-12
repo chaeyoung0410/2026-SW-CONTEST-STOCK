@@ -87,6 +87,30 @@ body.remedial-open {
     text-align: center;
 }
 
+.remedial_loading,
+.remedial_result,
+.remedial_error {
+    padding: 42px 12px 24px;
+    color: #4a4568;
+    text-align: center;
+}
+
+.remedial_loading strong,
+.remedial_result h2,
+.remedial_error strong {
+    display: block;
+    margin-bottom: 12px;
+    color: #1f1b3a;
+    font-size: 20px;
+}
+
+.remedial_loading p,
+.remedial_result p,
+.remedial_error p {
+    margin: 0 0 22px;
+    line-height: 1.55;
+}
+
 .remedial_character {
     width: 88px;
     height: auto;

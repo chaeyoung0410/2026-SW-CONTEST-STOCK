@@ -1,5 +1,3 @@
-from datetime import datetime, timezone
-
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
@@ -9,7 +7,6 @@ from app.models.answer_attempt import AnswerAttempt
 from app.models.history import History
 from app.models.progress import Progress
 from app.models.question import Question
-from app.models.recommendation_history import RecommendationHistory
 from app.models.result import Result
 from app.models.stage import Stage
 from app.models.user import User
@@ -142,21 +139,10 @@ def save_result(
         if server_correct_count != resolved_correct_count or server_score != score:
             raise _unprocessable("Submitted result does not match server answer records")
 
-    recommendation: RecommendationHistory | None = None
     if recommendation_id is not None:
-        recommendation = db.get(RecommendationHistory, recommendation_id)
-        if recommendation is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Recommendation not found",
-            )
-        if recommendation.user_id != user_id:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Recommendation access denied",
-            )
-        if recommendation.stage_id != stage_id:
-            raise _unprocessable("Recommendation does not match the completed stage")
+        raise _unprocessable(
+            "recommendation_id is only supported by the AI recommendation quiz endpoint"
+        )
 
     accuracy = round((resolved_correct_count / total_question) * 100, 2)
     # Preserve the existing game rule: finishing a stage unlocks the next one.
@@ -202,17 +188,6 @@ def save_result(
         db.flush()
         for attempt in answer_attempts:
             attempt.result_id = result.result_id
-        if recommendation is not None:
-            completed_at = datetime.now(timezone.utc)
-            if not recommendation.clicked:
-                recommendation.clicked = True
-                recommendation.clicked_at = completed_at
-            if not recommendation.learning_started:
-                recommendation.learning_started = True
-                recommendation.started_at = completed_at
-            recommendation.learning_completed = True
-            recommendation.completed_at = recommendation.completed_at or completed_at
-            recommendation.completion_result_id = result.result_id
         building_state = get_building_state(db, user_id)
         level = building_state["level"]
         db.commit()

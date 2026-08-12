@@ -9,6 +9,7 @@ from sqlalchemy.pool import StaticPool
 from app.core.security import hash_password
 from app.db.base import Base
 from app.models.question import Question
+from app.models.recommendation_history import RecommendationHistory
 from app.models.result import Result
 from app.models.stage import Stage
 from app.models.user import User
@@ -19,6 +20,7 @@ from app.services.recommend_service import (
     record_recommendation_interaction,
 )
 from app.services.result_service import save_result
+from app.services.recommendation_quiz_service import complete_recommendation_quiz
 from app.services.statistics_service import (
     calculate_recommendation_quality_metrics,
     get_user_statistics,
@@ -69,6 +71,7 @@ class StatisticsTestCase(unittest.TestCase):
         self.engine.dispose()
 
     def test_interactions_are_idempotent_and_owner_only(self) -> None:
+        submit_answer(self.db, self.user.user_id, 1, 2, "interaction-baseline-wrong")
         recommendation = get_recommendations(self.db, self.user.user_id)[0]
         recommendation_id = recommendation["recommendation_id"]
         completed_at = datetime(2026, 8, 4, 12, 0, tzinfo=timezone.utc)
@@ -79,27 +82,29 @@ class StatisticsTestCase(unittest.TestCase):
         start = record_recommendation_interaction(
             self.db, self.user.user_id, recommendation_id, "start"
         )
-        first_complete = record_recommendation_interaction(
+        first_complete = complete_recommendation_quiz(
             self.db,
             self.user.user_id,
             recommendation_id,
-            "complete",
+            2,
+            3,
             now=completed_at,
         )
-        duplicate_complete = record_recommendation_interaction(
+        duplicate_complete = complete_recommendation_quiz(
             self.db,
             self.user.user_id,
             recommendation_id,
-            "complete",
+            3,
+            3,
             now=completed_at + timedelta(days=1),
         )
 
         self.assertFalse(click.already_applied)
         self.assertFalse(start.already_applied)
-        self.assertFalse(first_complete.already_applied)
-        self.assertTrue(duplicate_complete.already_applied)
+        self.assertTrue(first_complete["learning_completed"])
+        self.assertTrue(duplicate_complete["learning_completed"])
         self.assertEqual(
-            duplicate_complete.history.completed_at.replace(tzinfo=timezone.utc),
+            self.db.get(RecommendationHistory, recommendation_id).completed_at.replace(tzinfo=timezone.utc),
             completed_at,
         )
         with self.assertRaises(HTTPException) as forbidden:
@@ -109,12 +114,14 @@ class StatisticsTestCase(unittest.TestCase):
         self.assertEqual(forbidden.exception.status_code, 403)
 
     def test_completed_recommendation_without_post_quiz_is_pending(self) -> None:
+        submit_answer(self.db, self.user.user_id, 1, 2, "pending-baseline-wrong")
         recommendation = get_recommendations(self.db, self.user.user_id)[0]
-        record_recommendation_interaction(
+        complete_recommendation_quiz(
             self.db,
             self.user.user_id,
             recommendation["recommendation_id"],
-            "complete",
+            2,
+            3,
         )
 
         statistics = get_user_statistics(self.db, self.user.user_id)
@@ -147,6 +154,14 @@ class StatisticsTestCase(unittest.TestCase):
             self.user.user_id,
             now=baseline_time + timedelta(days=1),
         )[0]
+        complete_recommendation_quiz(
+            self.db,
+            self.user.user_id,
+            recommendation["recommendation_id"],
+            2,
+            3,
+            now=baseline_time + timedelta(days=1),
+        )
         answer = submit_answer(
             self.db,
             self.user.user_id,
@@ -163,7 +178,6 @@ class StatisticsTestCase(unittest.TestCase):
             1,
             answer_attempt_ids=[answer["attempt_id"]],
             submission_id="statistics-result",
-            recommendation_id=recommendation["recommendation_id"],
         )
 
         statistics = get_user_statistics(self.db, self.user.user_id)
@@ -183,12 +197,14 @@ class StatisticsTestCase(unittest.TestCase):
         self.assertTrue(effect["retested_after_recommendation"])
 
     def test_operator_quality_metrics_are_calculated_without_public_route(self) -> None:
+        submit_answer(self.db, self.user.user_id, 1, 2, "quality-baseline-wrong")
         recommendation = get_recommendations(self.db, self.user.user_id)[0]
-        record_recommendation_interaction(
+        complete_recommendation_quiz(
             self.db,
             self.user.user_id,
             recommendation["recommendation_id"],
-            "complete",
+            2,
+            3,
         )
 
         metrics = calculate_recommendation_quality_metrics(self.db)
@@ -198,7 +214,7 @@ class StatisticsTestCase(unittest.TestCase):
         self.assertEqual(metrics["completion_rate"], 100.0)
         self.assertEqual(metrics["retest_rate"], 0.0)
         self.assertEqual(metrics["top_recommendation_selection_rate"], 100.0)
-        self.assertEqual(metrics["default_recommendation_completion_rate"], 100.0)
+        self.assertIsNone(metrics["default_recommendation_completion_rate"])
         self.assertIsNone(metrics["post_recommendation_improvement_rate"])
 
 

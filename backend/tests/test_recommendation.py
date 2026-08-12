@@ -20,7 +20,8 @@ from app.models.user import User
 from app.schemas.result import ResultRequest
 from app.services.auth_service import login
 from app.services.quiz_service import submit_answer
-from app.services.recommend_service import get_recommendations, update_recommendation_feedback
+from app.services.recommend_service import get_recommendations
+from app.services.recommendation_quiz_service import complete_recommendation_quiz
 from app.services.recommendation_scoring import RecommendationSignals, calculate_recommendation_score
 from app.services.result_service import save_result
 
@@ -71,19 +72,14 @@ class RecommendationTestCase(unittest.TestCase):
             )
         )
 
-    def test_new_user_gets_default_recommendation(self) -> None:
+    def test_new_user_without_wrong_answers_gets_no_recommendation(self) -> None:
         items = get_recommendations(
             self.db,
             self.user.user_id,
             now=datetime(2026, 8, 4, tzinfo=timezone.utc),
         )
 
-        self.assertEqual(len(items), 1)
-        self.assertEqual(items[0]["stage_id"], 1)
-        self.assertEqual(items[0]["priority"], 1)
-        self.assertEqual(items[0]["wrong_count"], 0)
-        self.assertIn("풀이 기록이 없어", items[0]["recommendation_reason"])
-        self.assertGreaterEqual(items[0]["recommendation_score"], 0)
+        self.assertEqual(items, [])
 
     def test_weak_stage_is_ranked_first(self) -> None:
         self.db.add(Progress(user_id=self.user.user_id, stage_id=1, cleared=True, score=10, accuracy=100))
@@ -119,15 +115,28 @@ class RecommendationTestCase(unittest.TestCase):
         self.assertEqual(items[0]["current_accuracy"], 0)
         self.assertIn("3회 오답", items[0]["recommendation_reason"])
 
-    def test_consecutive_top_recommendation_is_penalized(self) -> None:
+    def test_same_cumulative_data_keeps_stable_ranking(self) -> None:
         self.db.add(Progress(user_id=self.user.user_id, stage_id=1, cleared=True, score=10, accuracy=100))
+        self.db.add_all(
+            [
+                AnswerAttempt(
+                    user_id=self.user.user_id,
+                    question_id=stage_id,
+                    stage_id=stage_id,
+                    selected_answer=2,
+                    correct=False,
+                    submission_id=f"stable-wrong-{stage_id}",
+                )
+                for stage_id in (1, 2)
+            ]
+        )
         self.db.commit()
         now = datetime(2026, 8, 4, 12, 0, tzinfo=timezone.utc)
 
         first = get_recommendations(self.db, self.user.user_id, limit=2, now=now)
         second = get_recommendations(self.db, self.user.user_id, limit=2, now=now)
 
-        self.assertEqual(first[0]["stage_id"], 2)
+        self.assertEqual(first[0]["stage_id"], 1)
         self.assertEqual(second[0]["stage_id"], 1)
         history_count = self.db.scalar(select(func.count()).select_from(RecommendationHistory))
         self.assertEqual(history_count, 4)
@@ -149,7 +158,8 @@ class RecommendationTestCase(unittest.TestCase):
             save_result(self.db, self.user.user_id, 2, 10, 1, 1)
         self.assertEqual(result_error.exception.status_code, 403)
 
-    def test_result_is_server_verified_idempotent_and_completes_recommendation(self) -> None:
+    def test_result_is_server_verified_idempotent_and_does_not_complete_recommendation(self) -> None:
+        submit_answer(self.db, self.user.user_id, 1, 2, "recommendation-baseline-wrong")
         recommendation = get_recommendations(self.db, self.user.user_id)[0]
         answer = submit_answer(
             self.db,
@@ -166,7 +176,6 @@ class RecommendationTestCase(unittest.TestCase):
             "total_question": 1,
             "answer_attempt_ids": [answer["attempt_id"]],
             "submission_id": "verified-result-submission",
-            "recommendation_id": recommendation["recommendation_id"],
         }
 
         first = save_result(self.db, **request)
@@ -180,8 +189,8 @@ class RecommendationTestCase(unittest.TestCase):
             RecommendationHistory, recommendation["recommendation_id"]
         )
         self.assertIsNotNone(attempt.result_id)
-        self.assertTrue(history.learning_completed)
-        self.assertIsNotNone(history.completed_at)
+        self.assertFalse(history.learning_completed)
+        self.assertIsNone(history.completed_at)
 
     def test_tampered_score_is_rejected(self) -> None:
         with self.assertRaises(HTTPException) as error:
@@ -217,15 +226,18 @@ class RecommendationTestCase(unittest.TestCase):
         self.assertEqual(item["wrong_count"], 1)
 
     def test_recommendation_click_and_completion_are_recorded(self) -> None:
+        submit_answer(self.db, self.user.user_id, 1, 2, "feedback-baseline-wrong")
         item = get_recommendations(self.db, self.user.user_id)[0]
-        history = update_recommendation_feedback(
+        result = complete_recommendation_quiz(
             self.db,
             self.user.user_id,
             item["recommendation_id"],
-            clicked=True,
-            learning_completed=True,
+            2,
+            3,
         )
+        history = self.db.get(RecommendationHistory, item["recommendation_id"])
 
+        self.assertTrue(result["passed"])
         self.assertTrue(history.clicked)
         self.assertTrue(history.learning_completed)
         self.assertIsNotNone(history.completed_at)
