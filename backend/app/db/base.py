@@ -5,6 +5,7 @@ from app.models.learning import Learning
 from app.models.progress import Progress
 from app.models.recommendation_history import RecommendationHistory
 from app.models.question import Question
+from app.models.remedial_question_cache import RemedialQuestionCache
 from app.models.result import Result
 from app.models.stage import Stage
 from app.models.user import User
@@ -18,6 +19,7 @@ __all__ = [
     "Progress",
     "RecommendationHistory",
     "Question",
+    "RemedialQuestionCache",
     "Result",
     "Stage",
     "User",
