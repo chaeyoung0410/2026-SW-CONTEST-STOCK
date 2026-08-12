@@ -413,13 +413,8 @@ conceptBtn.addEventListener("click", () => {
     showConcept();
 });
 
-// 다시 풀기 (현재 스테이지 처음부터)
+// 다시 풀기 (틀린 현재 문제부터 재도전)
 retryStageBtn.addEventListener("click", () => {
-    currentQuestionIndex = 0;
-    correctCount = 0;
-    stageScore = 0;
-    currentAnswerAttemptIds = [];
-    currentResultSubmissionId = createSubmissionId();
     loadQuestion();
 });
 
