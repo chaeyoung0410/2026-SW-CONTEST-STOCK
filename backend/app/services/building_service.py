@@ -29,6 +29,7 @@ NEXT_FEATURES = {
 }
 
 
+# 클리어한 스테이지 수를 건물 레벨로 환산
 def get_building_level(db: Session, user_id: int) -> int:
     statement = (
         select(func.count())
@@ -60,6 +61,7 @@ def get_next_features(level: int) -> list[str]:
     return NEXT_FEATURES.get(capped_level, [])
 
 
+# 마이빌딩 화면에 필요한 건물 상태(레벨/이미지/진행률/다음 변화) 종합
 def get_building_state(db: Session, user_id: int) -> dict:
     level = get_building_level(db, user_id)
 

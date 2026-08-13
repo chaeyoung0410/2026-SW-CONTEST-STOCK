@@ -10,6 +10,7 @@ from app.services.stage_service import get_stage_list
 router = APIRouter(tags=["Stage"])
 
 
+# 전체 스테이지 목록(잠금/클리어 상태 포함) 조회
 @router.get("/stage", response_model=list[StageResponse])
 def get_stages(
     db: Session = Depends(get_db),

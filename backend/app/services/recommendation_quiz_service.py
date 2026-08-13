@@ -92,6 +92,7 @@ def generate_quiz_for_recommendation(
     }
 
 
+# 추천 퀴즈 채점: 3문제 중 2문제 이상 정답이면 통과 처리하고 추천 완료 상태로 기록
 def complete_recommendation_quiz(
     db: Session,
     user_id: int,
@@ -128,6 +129,7 @@ def complete_recommendation_quiz(
     }
 
 
+# 추천 기록 조회 + 소유자 검증 (없으면 404, 남의 것이면 403)
 def _get_owned_history(
     db: Session, user_id: int, recommendation_id: int
 ) -> RecommendationHistory:
@@ -139,6 +141,7 @@ def _get_owned_history(
     return history
 
 
+# tz 정보가 없는 datetime을 UTC로 간주해 비교 가능하게 정규화
 def _as_utc(value: datetime) -> datetime:
     if value.tzinfo is None:
         return value.replace(tzinfo=timezone.utc)

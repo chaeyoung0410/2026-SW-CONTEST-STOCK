@@ -10,6 +10,7 @@ from app.services.quiz_service import get_questions, submit_answer
 router = APIRouter(tags=["Quiz"])
 
 
+# 스테이지별 퀴즈 문제 목록 조회
 @router.get("/question/{stage_id}", response_model=list[QuestionResponse])
 def get_stage_questions(
     stage_id: int,
@@ -19,6 +20,7 @@ def get_stage_questions(
     return get_questions(db, stage_id, current_user.user_id)
 
 
+# 퀴즈 답안 제출 및 채점
 @router.post("/answer", response_model=AnswerResponse)
 def submit_quiz_answer(
     request: AnswerRequest,

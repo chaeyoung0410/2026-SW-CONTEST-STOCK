@@ -8,6 +8,7 @@ from app.services.news_service import get_news
 router = APIRouter(tags=["News"])
 
 
+# 최신 주식/증권 뉴스 목록 조회
 @router.get("/news", response_model=list[NewsItemResponse])
 def get_news_list(current_user: User = Depends(get_current_user)) -> list[dict]:
     return get_news(limit=5)

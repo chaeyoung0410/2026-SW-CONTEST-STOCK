@@ -167,6 +167,7 @@ def get_recommendations(
         raise
 
 
+# 추천 콘텐츠의 클릭/학습 시작 상태를 기록 (이미 적용된 경우 already_applied=True로 알림)
 def record_recommendation_interaction(
     db: Session,
     user_id: int,
@@ -204,6 +205,7 @@ def record_recommendation_interaction(
     )
 
 
+# 추천 기록 조회 + 소유자 검증 (없으면 404, 남의 것이면 403)
 def _get_owned_recommendation(
     db: Session, user_id: int, recommendation_id: int
 ) -> RecommendationHistory:
@@ -283,6 +285,7 @@ def _collect_topic_stats(db: Session, user_id: int) -> dict[int, TopicStats]:
     return stats
 
 
+# 아직 클리어하지 못한 가장 앞선 스테이지(=현재 진도)를 찾는다. 전부 클리어했으면 마지막 스테이지.
 def _get_current_stage_id(db: Session, user_id: int, stages: list[Stage]) -> int:
     cleared_ids = set(
         db.scalars(
@@ -298,6 +301,7 @@ def _get_current_stage_id(db: Session, user_id: int, stages: list[Stage]) -> int
     return stages[-1].stage_id
 
 
+# 스테이지별 학습 페이지 목록을 미리 조회해 stage_id로 묶어둔다
 def _get_learning_by_stage(db: Session, stages: list[Stage]) -> dict[int, list[Learning]]:
     stage_ids = [stage.stage_id for stage in stages]
     if not stage_ids:
@@ -315,6 +319,7 @@ def _get_learning_by_stage(db: Session, stages: list[Stage]) -> dict[int, list[L
     return grouped
 
 
+# 스테이지별 대표 주제 태그(첫 문제의 tag)를 조회
 def _get_topics(db: Session, stages: list[Stage]) -> dict[int, str]:
     stage_ids = [stage.stage_id for stage in stages]
     if not stage_ids:
@@ -326,6 +331,7 @@ def _get_topics(db: Session, stages: list[Stage]) -> dict[int, str]:
     return topics
 
 
+# 사용자의 추천 노출 이력을 스테이지별로 최신순 그룹핑 (재노출/재추천 판단에 사용)
 def _get_recent_history(
     db: Session, user_id: int
 ) -> dict[int, list[RecommendationHistory]]:
@@ -342,12 +348,14 @@ def _get_recent_history(
     return grouped
 
 
+# 두 시각 중 더 최근 값을 반환
 def _latest(current: datetime | None, candidate: datetime) -> datetime:
     if current is None or _as_utc(candidate) > _as_utc(current):
         return candidate
     return current
 
 
+# tz 정보가 없는 datetime을 UTC로 간주해 비교 가능하게 정규화
 def _as_utc(value: datetime) -> datetime:
     if value.tzinfo is None:
         return value.replace(tzinfo=timezone.utc)

@@ -27,24 +27,28 @@ class RecommendationQualityMetrics:
     default_recommendation_completion_rate: float | None
 
 
+# tz 정보가 없는 datetime을 UTC로 간주해 비교 가능하게 정규화
 def _as_utc(value: datetime) -> datetime:
     if value.tzinfo is None:
         return value.replace(tzinfo=timezone.utc)
     return value.astimezone(timezone.utc)
 
 
+# 결과 하나의 정답률(%) 계산
 def _accuracy(result: Result | None) -> float | None:
     if result is None or result.total_question <= 0:
         return None
     return round((result.correct_count / result.total_question) * 100, 2)
 
 
+# 결과 하나의 오답 수 계산
 def _wrong_count(result: Result | None) -> int | None:
     if result is None:
         return None
     return max(0, result.total_question - result.correct_count)
 
 
+# 스테이지별 대표 주제 태그(첫 문제의 tag) 조회
 def _topic_by_stage(db: Session) -> dict[int, str]:
     topics: dict[int, str] = {}
     for question in db.scalars(select(Question).order_by(Question.question_id)):
@@ -52,6 +56,7 @@ def _topic_by_stage(db: Session) -> dict[int, str]:
     return topics
 
 
+# 특정 시각 이전에 제출된 해당 스테이지의 가장 최근 결과(추천 전 기준선)를 찾는다
 def _result_before(
     results: list[Result], stage_id: int, before: datetime
 ) -> Result | None:
@@ -63,6 +68,7 @@ def _result_before(
     return candidates[-1] if candidates else None
 
 
+# 추천 학습 완료 이후 처음 다시 푼 결과(사후 성과 측정 기준)를 찾는다
 def _post_result(
     history: RecommendationHistory,
     results: list[Result],
@@ -84,6 +90,7 @@ def _post_result(
     )
 
 
+# 완료된 추천 콘텐츠마다 추천 전/후 정답률·점수·오답 수를 비교해 효과를 산출
 def _build_recommendation_effects(
     histories: list[RecommendationHistory],
     results: list[Result],
@@ -151,6 +158,8 @@ def _build_recommendation_effects(
     return effects
 
 
+# 마이페이지 통계 화면용 종합 데이터: 전체/최근 정답률, 스테이지별 통계,
+# 취약/개선 주제, 추천 콘텐츠 효과까지 한 번에 계산
 def get_user_statistics(
     db: Session,
     user_id: int,
@@ -386,6 +395,7 @@ def calculate_recommendation_quality_metrics(db: Session) -> dict:
     return asdict(metrics)
 
 
+# 추천 이력을 사용자별로 묶는다
 def _group_histories_by_user(
     histories: list[RecommendationHistory],
 ) -> dict[int, list[RecommendationHistory]]:
@@ -395,6 +405,7 @@ def _group_histories_by_user(
     return grouped
 
 
+# 백분율 계산 (분모가 0이면 None)
 def _rate(numerator: int, denominator: int) -> float | None:
     if denominator == 0:
         return None

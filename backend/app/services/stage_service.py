@@ -6,6 +6,7 @@ from app.models.progress import Progress
 from app.models.stage import Stage
 
 
+# 전체 스테이지 목록에 사용자별 클리어/잠금 상태를 붙여서 반환
 def get_stage_list(db: Session, user_id: int | None = None) -> list[dict]:
     stages = list(db.scalars(select(Stage).order_by(Stage.stage_id)))
     cleared_stage_ids: set[int] = set()
@@ -31,6 +32,7 @@ def get_stage_list(db: Session, user_id: int | None = None) -> list[dict]:
     return response
 
 
+# 스테이지 존재 여부와 잠금 여부(이전 스테이지 클리어했는지)를 검증
 def ensure_stage_access(db: Session, stage_id: int, user_id: int | None = None) -> Stage:
     stage = db.get(Stage, stage_id)
     if stage is None:

@@ -112,6 +112,7 @@ def calculate_recommendation_score(
     )
 
 
+# 경과일이 window_days 이내면 1(최근)~0(경과) 사이 값으로, 밖이면 0으로 감쇠
 def _recency_value(days: float | None, window_days: int) -> float:
     if days is None:
         return 0.0

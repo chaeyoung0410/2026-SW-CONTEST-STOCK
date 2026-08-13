@@ -10,11 +10,13 @@ from app.schemas.user import UserResponse, UserUpdateRequest
 router = APIRouter(tags=["User"])
 
 
+# 내 계정 정보 조회
 @router.get("/user", response_model=UserResponse)
 def get_user(current_user: User = Depends(get_current_user)) -> UserResponse:
     return UserResponse(login_id=current_user.login_id)
 
 
+# 로그인 아이디 변경 (중복이면 409 반환)
 @router.patch("/user", response_model=UserResponse)
 def update_user(
     request: UserUpdateRequest,
@@ -30,6 +32,7 @@ def update_user(
     return UserResponse(login_id=current_user.login_id)
 
 
+# 프로필 정보 조회 (get_user와 동일한 응답)
 @router.get("/profile", response_model=UserResponse)
 def get_profile(current_user: User = Depends(get_current_user)) -> UserResponse:
     return UserResponse(login_id=current_user.login_id)

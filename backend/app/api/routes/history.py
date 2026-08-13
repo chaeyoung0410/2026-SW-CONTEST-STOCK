@@ -10,6 +10,7 @@ from app.services.history_service import get_history
 router = APIRouter(tags=["History"])
 
 
+# 사용자 학습/퀴즈 히스토리 조회
 @router.get("/history", response_model=list[HistoryResponse])
 def get_learning_history(
     db: Session = Depends(get_db),

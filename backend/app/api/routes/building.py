@@ -10,6 +10,7 @@ from app.services.building_service import get_building_state
 router = APIRouter(tags=["Building"])
 
 
+# 사용자 건물(성장도) 상태 조회
 @router.get("/building", response_model=BuildingResponse)
 def get_building(
     db: Session = Depends(get_db),

@@ -5,6 +5,7 @@ from app.models.history import History
 from app.models.stage import Stage
 
 
+# 사용자의 스테이지별 플레이 기록(점수/정답률)을 최신순으로 조회
 def get_history(db: Session, user_id: int) -> list[dict]:
     statement = (
         select(Stage.title, History.score, History.accuracy)

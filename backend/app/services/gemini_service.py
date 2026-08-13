@@ -12,16 +12,19 @@ from app.schemas.recommendation_quiz import GeminiRecommendationQuestionSet
 logger = logging.getLogger(__name__)
 
 
+# Gemini 호출 실패를 나타내는 기본 예외
 class GeminiServiceError(RuntimeError):
     def __init__(self, reason: str) -> None:
         super().__init__(reason)
         self.reason = reason
 
 
+# API 키가 설정되지 않은 경우
 class GeminiNotConfiguredError(GeminiServiceError):
     pass
 
 
+# Gemini Free Tier 등 호출 한도를 초과한 경우
 class GeminiRateLimitError(GeminiServiceError):
     pass
 
@@ -98,6 +101,7 @@ def generate_recommendation_quiz(
                 logger.warning("Gemini client close failed")
 
 
+# 추천 주제 데이터를 Gemini structured output 요청용 프롬프트 문자열로 변환
 def _build_recommendation_prompt(source: RecommendationQuizSource) -> str:
     source_data = {
         "stage_id": source.stage_id,
