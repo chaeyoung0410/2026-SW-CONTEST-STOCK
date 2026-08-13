@@ -168,11 +168,11 @@
 }
 
 .quiz_character {
-    margin: 10px 0 0 290px;
+    margin: 5px 0 0 280px;
 }
 
 .quiz_character img {
-    width: 280px;
+    width: 250px;
 }
 
 .quiz_question {
@@ -218,7 +218,7 @@
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 20px;
-    margin-top: -10px;
+    margin-top: -23px;
 }
 
 /* ============================================================ */
