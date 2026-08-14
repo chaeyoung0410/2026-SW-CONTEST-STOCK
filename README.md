@@ -80,25 +80,33 @@ AI 맞춤 문제 생성
 
 ### Frontend
 
-* HTML5
-* CSS3
-* JavaScript
+- HTML5
+- CSS3
+- JavaScript
 
 ### Backend
 
-* Python
-* FastAPI
-* SQLAlchemy
-* SQLite
+- Python
+- FastAPI
+- Pydantic
+- SQLAlchemy
+
+### Database
+
+- SQLite
+
+### Server
+
+- Uvicorn
 
 ### AI
 
-* Google Gemini API
+- Google Gemini API
 
 ### Collaboration
 
-* Git
-* GitHub
+- Git
+- GitHub
 
 ## 실행 환경
 
