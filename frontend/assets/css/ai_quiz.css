@@ -1,4 +1,3 @@
-/* Gemini 오답 복습 퀴즈 팝업. Gameplay의 기존 quiz_* 스타일과 충돌하지 않게 분리합니다. */
 body.remedial-open {
     overflow: hidden;
 }

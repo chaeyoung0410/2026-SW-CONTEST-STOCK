@@ -1,4 +1,3 @@
-// AI 추천학습 탭 전용 Gemini 퀴즈. 생성 문제는 브라우저 메모리에만 유지합니다.
 const RecommendationQuiz = (() => {
     let popup = null;
     let recommendationId = null;
