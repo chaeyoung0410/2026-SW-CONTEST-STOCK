@@ -1,0 +1,135 @@
+:root {
+    --motion-fast: 160ms;
+    --motion-normal: 280ms;
+    --motion-slow: 420ms;
+    --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@view-transition {
+    navigation: auto;
+}
+
+::view-transition-old(root) {
+    animation: page-out var(--motion-fast) ease both;
+}
+
+::view-transition-new(root) {
+    animation: page-in var(--motion-normal) var(--motion-ease) both;
+}
+
+html.motion-enabled body {
+    opacity: 0;
+    transform: translateY(8px);
+}
+
+html.motion-enabled.motion-ready body {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+        opacity var(--motion-normal) ease,
+        transform var(--motion-normal) var(--motion-ease);
+}
+
+html.motion-enabled.motion-leaving body {
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition:
+        opacity var(--motion-fast) ease,
+        transform var(--motion-fast) ease;
+}
+
+button,
+[role="button"],
+.gameplay_stage,
+.bottom-nav .nav-item {
+    transition:
+        translate var(--motion-fast) var(--motion-ease),
+        scale var(--motion-fast) var(--motion-ease),
+        filter var(--motion-fast) ease,
+        box-shadow var(--motion-fast) ease,
+        background-color var(--motion-fast) ease,
+        border-color var(--motion-fast) ease;
+}
+
+button:not(:disabled):hover,
+[role="button"]:hover,
+.gameplay_stage:not(.locked):hover {
+    translate: 0 -2px;
+    filter: brightness(1.035);
+}
+
+button:not(:disabled):active,
+[role="button"]:active,
+.gameplay_stage:not(.locked):active {
+    translate: 0 0;
+    scale: 0.97;
+}
+
+button:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible,
+.gameplay_stage:focus-visible {
+    outline: 3px solid rgba(110, 86, 207, 0.35);
+    outline-offset: 3px;
+}
+
+.login_card,
+.signup_card,
+.today-card,
+.list-card,
+.mypage-card,
+.profile-card,
+.final_card,
+.gameplay_building {
+    animation: surface-in var(--motion-slow) var(--motion-ease) both;
+}
+
+.list-row {
+    animation: surface-in var(--motion-slow) var(--motion-ease) both;
+}
+
+.list-row:nth-child(2) { animation-delay: 60ms; }
+.list-row:nth-child(3) { animation-delay: 120ms; }
+
+.motion-panel-enter {
+    animation: panel-in var(--motion-normal) var(--motion-ease) both;
+}
+
+@keyframes page-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes page-out {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-6px); }
+}
+
+@keyframes surface-in {
+    from { opacity: 0; transform: translateY(14px) scale(0.985); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes panel-in {
+    from { opacity: 0; transform: translateY(10px) scale(0.99); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 1ms !important;
+        animation-delay: 0ms !important;
+        scroll-behavior: auto !important;
+        transition-duration: 1ms !important;
+    }
+
+    html.motion-enabled body,
+    html.motion-enabled.motion-ready body,
+    html.motion-enabled.motion-leaving body {
+        opacity: 1;
+        transform: none;
+    }
+}

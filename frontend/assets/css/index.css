@@ -1,0 +1,48 @@
+.index_wrap{
+    width: 1536px;
+    height: 1024px;
+    margin: 0 auto;
+
+    background-image: url(../img/Main_img.png);
+
+    position: relative;
+}
+
+.index_main{
+    display: flex;
+}
+
+.index_main a{
+    text-decoration: none;
+}
+
+.index_m_box{
+    width: 474px;
+    height: 197px;
+    border-radius: 48px;
+    background: linear-gradient(to bottom, #743BD1, #422091);
+    border: 9px solid #D188F8;
+    margin-top: 540px;
+    margin-left: 100px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-weight: 600;
+    font-size: 53px;
+    color: white;
+}
+
+.index_book{
+    width: 144px;
+    height: 144px;
+    margin-top: 13px;
+    margin-left: -25px;
+}
+
+.index_char{
+    width: 401px;
+    margin-top: 400px;
+    margin-left: 30px;
+}

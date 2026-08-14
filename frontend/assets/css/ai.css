@@ -1,0 +1,264 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+
+.app-frame {
+  position: relative;
+
+  width: 1536px;
+  aspect-ratio: 1536 / 1024;
+
+  margin: 0 auto;
+
+  container-type: inline-size;
+
+  background-image: url("../img/ai.png");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  overflow: hidden;
+}
+
+/* 뒤로가기 버튼 */
+.icon-btn {
+  position: absolute;
+  top: 2.2%;
+  width: 6.2%;
+  height: 9.3%;
+  aspect-ratio: 1 / 1;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.icon-btn img {
+  width: 68%;
+  height: 68%;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+}
+
+.back-btn {
+  left: 1.69%;
+}
+
+/*  오늘의 추천 (상단 카드)  */
+.today-card {
+  position: absolute;
+  left: 28.91%;
+  top: 16.60%;
+  width: 62.70%;
+  height: 17.87%;
+}
+
+/* AI콘텐츠 영역  */
+.today-card .card-content {
+  position: absolute;
+  left: 28%;
+  top: 36%;
+  width: 40%;
+  height: 100%;
+}
+
+/*  추천 학습 콘텐츠 (리스트 카드)  */
+.list-card {
+  position: absolute;
+  left: 32%;
+  top: 43.5%;
+  width: 62.70%;
+  height: 37.79%;
+}
+
+.list-row {
+  position: relative;
+  width: 100%;
+  height: 33.333%;
+}
+
+.list-row .card-content {
+  position: absolute;
+  left: 18.07%;
+  top: 46%;
+  width: 55%;
+  height: 100%;
+
+}
+
+.card-content .rec-title {
+  font-size: 1.7cqw;
+  font-weight: 700;
+  color: black;
+  margin-bottom: 0.26cqw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-content .rec-desc {
+  font-size: 0.9cqw;
+  color: #5f587f;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-content .rec-reason {
+  margin-top: 0.6cqw;
+  color: #3d2e8f;
+  font-size: 1cqw;
+  line-height: 1.35;
+
+  white-space: nowrap;
+}
+
+/*  버튼  */
+.btn {
+  position: absolute;
+  border: none;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.15s ease, transform 0.05s ease;
+  font-size: 1.11cqw;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+/*학습시작 (primary)*/
+.btn-primary {
+  left: 27.5%;
+  top: 91%;
+  width: 13.08%;
+  height: 21.86%;
+  background: #5638be;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+/* 리스트 카드 각 항목 - "학습하기" (Secondary) */
+.btn-secondary {
+  left: 70%;
+  top: 62%;
+  width: 19.73%;
+  height: 41%;
+  background: #c9bdf0;
+  color: #3b2aae;
+  font-size: 1.3cqw;
+}
+
+.btn-secondary:hover {
+  background: #e1d9f5;
+}
+
+.bottom-nav {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 12%;
+  background: #191d47;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* 일반 메뉴 */
+.nav-item {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.52cqw;
+
+  border: none;
+  background: none;
+  cursor: pointer;
+
+  color: #b9b6da;
+  font-size: 0.98cqw;
+  font-weight: 600;
+  transition: color .2s;
+}
+
+/* 아이콘 크기 증가 */
+.nav-item img {
+  width: 3.58cqw;
+  height: 3.58cqw;
+}
+
+/* 위치 */
+.nav-item[data-nav="home"] {
+  left: 15.8%;
+}
+
+.nav-item[data-nav="mypage"] {
+  left: 80.5%;
+}
+
+.nav-item:hover {
+  color: #fff;
+}
+
+/* 가운데 버튼 */
+.nav-item--active {
+  left: 50%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 12.37cqw;
+  height: 7.49cqw;
+
+  gap: 0.52cqw;
+
+  border-radius: 1.56cqw;
+
+  background: linear-gradient(180deg,
+      #6b4de8 0%,
+      #4b2fae 100%);
+
+  color: #fff;
+  font-size: 1.11cqw;
+  font-weight: 700;
+
+  box-shadow: 0 0.52cqw 1.3cqw rgba(75, 47, 174, 0.45);
+
+  white-space: nowrap;
+}
+
+/* 가운데 아이콘 크게 */
+.nav-item--active img {
+  width: 3.91cqw;
+  height: 3.91cqw;
+}
+
+.nav-item--active:hover {
+  filter: brightness(1.08);
+}

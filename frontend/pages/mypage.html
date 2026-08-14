@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마이페이지</title>
+<link rel="stylesheet" href="../assets/css/mypage.css">
+<link rel="stylesheet" href="../assets/css/motion.css">
+<script src="../assets/js/motion.js" defer></script>
+
+</head>
+<body>
+
+  <div class="screen">
+
+    <!-- 뒤로가기 버튼 -->
+    <button class="icon-btn back-btn" type="button" aria-label="뒤로가기">
+      <img src="../assets/img/back.png" alt="">
+    </button>
+
+
+    <img src="../assets/img/mypage_icon.png" alt="" class="profile-image">
+    <!-- 프로필 카드 -->
+    <section class="profile-card">
+
+
+      <div class="user-id" id="userId"></div>
+
+      <!-- 아이디 수정 -->
+      <button class="profile-row" type="button" id="editIdBtn">
+        <span class="row-left">
+          <img class="row-icon" src="../assets/img/person.png" alt="">
+          <span class="row-text">아이디 수정</span>
+        </span>
+        <img class="row-chevron" src="../assets/img/arrow.png" alt="">
+      </button>
+
+      <!-- 로그아웃 -->
+      <button class="profile-row" type="button" id="logoutBtn">
+        <span class="row-left">
+          <img class="row-icon logout-icon" src="../assets/img/logout.png" alt="">
+          <span class="row-text">로그아웃</span>
+        </span>
+        <img class="row-chevron" src="../assets/img/arrow.png" alt="">
+      </button>
+
+    </section>
+
+    <!-- 경제 뉴스 -->
+    <section class="ad-card">
+      <div class="ad-label"><span class="sparkle">📈</span> 오늘의 경제 뉴스</div>
+      <div class="ad-placeholder" id="adPlaceholder">
+      </div>
+    </section>
+
+  </div>
+
+<!-- 아이디 수정 팝업 -->
+  <div class="modal-overlay" id="editIdModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 class="modal-title"><span class="sparkle">✨</span> 아이디 수정</h2>
+        <button type="button" class="modal-close" id="modalCloseBtn" aria-label="닫기">✕</button>
+      </div>
+ 
+      <p class="modal-subtitle">새로운 아이디를 입력해주세요.</p>
+ 
+      <label class="modal-label" for="newIdInput">새 아이디</label>
+      <div class="modal-input-wrap">
+        <input
+          type="text"
+          id="newIdInput"
+          class="modal-input"
+          placeholder="새 아이디를 입력해주세요"
+          maxlength="16"
+        >
+        <span class="char-count" id="charCount">0 / 16</span>
+      </div>
+ 
+      <p class="modal-hint">
+        <span class="hint-icon">ⓘ</span> 영문, 숫자 3~16자 (영문 최소 1자 포함)
+      </p>
+ 
+      <div class="modal-actions">
+        <button type="button" class="modal-btn modal-btn-cancel" id="modalCancelBtn">취소</button>
+        <button type="button" class="modal-btn modal-btn-confirm" id="modalConfirmBtn">확인</button>
+      </div>
+    </div>
+  </div>
+  <script src="../assets/js/mypage.js"></script>
+
+</body>
+</html>

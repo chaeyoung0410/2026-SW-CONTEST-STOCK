@@ -1,0 +1,290 @@
+/* 기본 설정 */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+button {
+    border: none;
+    cursor: pointer;
+}
+
+/* 전체 로그인 화면 */
+.login_wrap {
+    position: relative;
+    width: 1536px;
+    height: 1024px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background:
+        linear-gradient(rgba(18, 6, 91, 0.08), rgba(18, 6, 91, 0.08)),
+        url("../img/login-background.png");
+}
+
+/* 캐릭터 영역 */
+.character_area {
+    position: absolute;
+    left: -30px;
+    bottom: 160px;
+    height: 500px;
+}
+
+.login_character {
+    position: relative;
+    z-index: 11111;
+    width: 650px;
+    pointer-events: none;
+}
+
+/* 로그인 카드 */
+.login_card {
+    position: relative;
+    z-index: 5;
+    width: 825px;
+    height: 930px;
+    margin-left: 275px;
+    margin-bottom: 35px;
+    padding: 65px 95px 42px;
+    border: 8px solid #5232b8;
+    border-radius: 50px;
+    background-color: white;
+}
+
+
+/* 로그인 헤더 */
+.login_header {
+    text-align: center;
+}
+.logo_wrap {
+    position: relative;
+    width: 80px;
+    height: 75px;
+    margin: 0 auto 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo_icon {
+    width: 150px;
+}
+
+
+.login_title {
+    margin-bottom: 12px;
+    color: #16113f;
+    font-size: 47px;
+    line-height: 1;
+    font-weight: 900;
+}
+
+.login_description {
+    color: #464064;
+    font-size: 15px;
+    line-height: 1.55;
+    font-weight: 600;
+}
+
+
+/* 로그인 폼 */
+.login_form {
+    margin-top: 45px;
+}
+.input_group {
+    position: relative;
+    margin-bottom: 23px;
+}
+.input_label {
+    display: block;
+
+    margin-bottom: 9px;
+
+    color: #15112f;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.input_box {
+    width: 100%;
+    height: 58px;
+
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    cursor: pointer;
+
+    border: 1.5px solid #b8a3e9;
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, 0.42);
+
+    transition:
+        border-color 0.2s,
+        background 0.2s,
+        box-shadow 0.2s;
+}
+
+.input_box:focus-within {
+    border-color: #5d32c2;
+
+    background: rgba(255, 255, 255, 0.75);
+
+    box-shadow: 0 0 0 4px rgba(93, 50, 194, 0.1);
+}
+
+.input_icon {
+    width: 20px;
+    pointer-events: none;
+}
+
+.input_box input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border: none;
+    outline: none;
+
+    cursor: pointer;
+
+    background: transparent;
+
+    color: #20194c;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.input_box input::placeholder {
+    color: #8d87a2;
+    font-weight: 500;
+}
+
+
+/* 비밀번호 보기 */
+.password_toggle {
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: transparent;
+}
+
+.password_toggle img{
+    pointer-events: none;
+}
+
+/* 오류 메시지 */
+.error_message {
+    display: none;
+
+    position: absolute;
+    left: 6px;
+    bottom: -25px;
+
+    color: #ff2020;
+    font-size: 21px;
+    font-weight: 900;
+}
+
+.error_message.active {
+    display: block;
+}
+
+.input_box.error {
+    border-color: #ff3d3d;
+
+    box-shadow: 0 0 0 3px rgba(255, 61, 61, 0.1);
+}
+
+
+/* 버튼 */
+.login_button,
+.signup_button {
+    width: 100%;
+    height: 62px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+
+    border-radius: 9px;
+
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+
+    transition:
+        transform 0.15s,
+        box-shadow 0.15s,
+        background 0.15s;
+}
+
+.login_button {
+    margin-top: 38px;
+
+    background: linear-gradient(180deg,
+            #5423bd 0%,
+            #3b1599 100%);
+
+    color: #ffffff;
+
+    box-shadow: 0 8px 18px rgba(67, 25, 160, 0.25);
+}
+
+.login_button:hover {
+    transform: translateY(-2px);
+
+    box-shadow: 0 11px 22px rgba(67, 25, 160, 0.32);
+}
+
+.login_button:active {
+    transform: translateY(0);
+}
+
+.signup_button {
+    border: 2px solid #7a43d4;
+
+    background: rgba(255, 255, 255, 0.35);
+
+    color: #5521b3;
+}
+
+.signup_button:hover {
+    background: rgba(115, 67, 204, 0.08);
+}
+
+
+/* 또는 구분선 */
+.divider {
+    margin: 23px 0;
+
+    display: flex;
+    align-items: center;
+    gap: 17px;
+}
+
+.divider_line {
+    flex: 1;
+    height: 1px;
+
+    background: #c8bfdd;
+}
+
+.divider_text {
+    color: #8e879e;
+    font-size: 13px;
+}
+
+.input_icon {
+    width: 20px;
+    pointer-events: none;
+}

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gameplay</title>
+    <link rel="stylesheet" href="../assets/css/Gameplay.css">
+    <link rel="stylesheet" href="../assets/css/motion.css">
+    <script src="../assets/js/motion.js" defer></script>
+</head>
+
+<body>
+
+    <div class="Gameplay_wrap">
+
+        <!-- 스테이지 -->
+        <div class="gameplay_stages">
+            <img src="../assets/img/player.png" alt="플레이어" id="playerCharacter" class="player_character">
+
+            <div class="gameplay_stage stage1" data-stage="1">1</div>
+            <div class="gameplay_stage stage2" data-stage="2">2</div>
+            <div class="gameplay_stage stage3" data-stage="3">3</div>
+            <div class="gameplay_stage stage4" data-stage="4">4</div>
+            <div class="gameplay_stage stage5" data-stage="5">5</div>
+            <div class="gameplay_stage stage6" data-stage="6">6</div>
+            <div class="gameplay_stage stage7" data-stage="7">7</div>
+            <div class="gameplay_stage stage8" data-stage="8">8</div>
+            <div class="gameplay_stage stage9" data-stage="9">9</div>
+            <div class="gameplay_stage stage10" data-stage="10">10</div>
+            <div class="gameplay_stage stage11" data-stage="11">11</div>
+            <div class="gameplay_stage stage12" data-stage="12">12</div>
+            <div class="gameplay_stage stage13" data-stage="13">13</div>
+            <div class="gameplay_stage stage14" data-stage="14">14</div>
+        </div>
+
+        <!-- 나의 건물 -->
+        <div class="gameplay_building">
+            <p id="buildingLevel">Lv. 0</p>
+            <p class="level_2">단계를 클리어 할 수록<br />건물이 발전해요!</p>
+            <img src="../assets/img/building_1.png" id="myBuilding" class="building_img">
+            <!-- 건물 성장도 -->
+            <div class="building_progress_wrap">
+                <div class="building_progress_header">
+                    <span>건물 성장도</span>
+                    <span id="buildingPercent">20%</span>
+                </div>
+
+                <div class="building_progress_bg">
+                    <div class="building_progress_fill" id="buildingProgressFill"></div>
+                </div>
+            </div>
+
+            <!-- 다음 레벨 -->
+            <div class="next_level_box">
+                <div class="next_level_title">
+                    ✨ 다음 레벨에서 변화해요!
+                </div>
+                <ul id="nextLevelList">
+                    <li>외관 업그레이드</li>
+                    <li>간판 설치</li>
+                    <li>조명 추가</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 퀴즈 팝업 -->
+        <div class="quiz_popup" id="quizPopup">
+
+            <div class="quiz_container">
+
+                <!-- 공통 헤더 -->
+                <div class="quiz_header">
+                    <div class="quiz_progress_bg">
+                        <div class="quiz_progress_bar" id="progressBar"></div>
+                    </div>
+                </div>
+
+                <!-- 문제 화면 -->
+                <div class="quiz_page" id="quizPage">
+                    <div class="quiz_character">
+                        <img src="../assets/img/quiz_character.png" alt="캐릭터">
+                    </div>
+                    <div class="quiz_content">
+
+                        <div class="quiz_question" id="quizQuestion">
+                            문제 내용이 들어갑니다.
+                        </div>
+                        <div class="quiz_options">
+                            <button class="quiz_option" id="option1"></button>
+                            <button class="quiz_option" id="option2"></button>
+                            <button class="quiz_option" id="option3"></button>
+                            <button class="quiz_option" id="option4"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 정답 화면 -->
+                <div class="correct_page" id="correctPage">
+
+                    <!-- 리본 -->
+                    <div class="correct_ribbon">
+                        정답!
+                    </div>
+
+                    <!-- 카드 -->
+                    <div class="correct_card">
+
+                        <div class="result_character">
+                            <img src="../assets/img/correct_character.png" alt="정답 캐릭터">
+                        </div>
+
+                        <h2 class="result_title" id="correctText">
+                            정답이에요!
+                        </h2>
+
+                        <p class="result_desc" id="correctDesc">
+                            회사의 소유권을 나타내는 증권입니다.
+                        </p>
+
+                        <!-- 성장도 -->
+                        <div class="upgrade_box">
+
+                            <div class="upgrade_header">
+                                <span>집 업그레이드</span>
+                                <span id="buildingProgressText">0 / 15</span>
+                            </div>
+
+                            <div class="upgrade_progress">
+                                <div class="upgrade_progress_bar" id="buildingProgressBar"></div>
+                            </div>
+
+                            <div class="building_preview">
+                                <img src="../assets/img/building_0.png">
+                                <span>→</span>
+                                <img src="../assets/img/building_6.png">
+                                <span>→</span>
+                                <img src="../assets/img/building_14.png">
+                            </div>
+
+                        </div>
+
+                        <button class="result_btn" id="nextQuestionBtn">
+                            다음 단계로
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <!-- 오답 화면 -->
+                <div class="wrong_page" id="wrongPage">
+
+                    <div class="wrong_ribbon">
+                        아쉽게도 오답이에요!
+                    </div>
+
+                    <div class="wrong_card">
+
+                        <div class="wrong_character">
+                            <img src="../assets/img/wrong_character.png">
+                        </div>
+
+                        <div class="selected_answer">
+                            <span>선택한 답 : <span class="wrong" id="selectedAnswer"></span></span>
+                            ❌
+                        </div>
+
+                        <div class="correct_answer_box">
+                            정답은 <span class="correct" id="correctAnswer"></span> 입니다.
+                        </div>
+
+                        <div class="upgrade_box">
+
+                            <div class="upgrade_header">
+                                <span>집 업그레이드</span>
+                                <span id="wrongBuildingProgressText">0 / 15</span>
+                            </div>
+
+                            <div class="upgrade_progress">
+                                <div class="upgrade_progress_bar" id="wrongBuildingProgressBar"></div>
+                            </div>
+
+                            <div class="building_preview">
+                                <img src="../assets/img/building_0.png">
+                                <span>→</span>
+                                <img src="../assets/img/building_6.png">
+                                <span>→</span>
+                                <img src="../assets/img/building_14.png">
+                            </div>
+
+                        </div>
+
+                        <button class="wrong_btn" id="conceptBtn">
+                            개념 설명 보기
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <!-- 개념 설명 화면 -->
+                <div class="concept_page" id="conceptPage">
+                    <div class="concept_character">
+                    </div>
+                    <h2 class="concept_title">개념 설명</h2>
+                    <div class="concept_box">
+                        <h3 id="conceptName">주식</h3>
+                        <p id="conceptDescription">
+                            주식은 회사의 소유권을 나타내는 증권입니다.
+                        </p>
+                    </div>
+
+                    <!-- 다시 도전 선택 영역 -->
+                    <div class="retry_box">
+                        <div class="retry_ribbon">다시 도전할까요?</div>
+                        <p class="retry_description">이번 문제를 다시 풀어보거나<br>다음 단계로 넘어갈 수 있어요.</p>
+                        <div class="retry_buttons">
+                            <button type="button" class="retry_btn" id="retryStageBtn">
+                                <span class="retry_icon">↻</span>
+                                <span>다시 풀기</span>
+                            </button>
+
+                            <button type="button" class="next_stage_btn" id="nextStageBtn">
+                                <span class="next_icon">➜</span>
+                                <span>다음 단계로</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="concept_tip">
+                        <span class="tip_icon">💡</span>
+                        <div class="tip_content">
+                            <strong>TIP</strong>
+                            <p>처음 틀려도 괜찮아요!<br>많이 풀수록 더 많이 배울 수 있어요.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 네비게이션 바 -->
+        <footer class="bottom-nav">
+
+            <button class="nav-item nav-item--active" type="button" data-nav="home">
+                <img src="../assets/img/home.png" alt="홈">
+                <span>홈</span>
+            </button>
+
+            <button class="nav-item" type="button" data-nav="ai-recommend">
+                <img src="../assets/img/ai_icon.png" alt="AI 추천 학습">
+                <span>AI 추천 학습</span>
+            </button>
+
+            <button class="nav-item" type="button" data-nav="mypage">
+                <img src="../assets/img/person.png" alt="마이페이지">
+                <span>마이페이지</span>
+            </button>
+
+        </footer>
+
+    </div>
+
+    <script src="../assets/js/Gameplay.js?v=20260812-3"></script>
+
+
+</body>
+
+</html>
