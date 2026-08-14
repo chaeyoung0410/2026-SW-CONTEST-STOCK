@@ -10,6 +10,7 @@ from app.services.statistics_service import get_user_statistics
 router = APIRouter(tags=["Statistics"])
 
 
+# 내 학습 통계(정답률, 추천 효과 등) 조회
 @router.get("/users/me/statistics", response_model=UserStatisticsResponse)
 def get_my_statistics(
     db: Session = Depends(get_db),

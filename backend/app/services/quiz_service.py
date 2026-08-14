@@ -9,6 +9,7 @@ from app.models.user import User
 from app.services.stage_service import ensure_stage_access
 
 
+# 스테이지 접근 권한 확인 후 해당 스테이지의 문제 목록 조회
 def get_questions(db: Session, stage_id: int, user_id: int | None = None) -> list[dict]:
     ensure_stage_access(db, stage_id, user_id)
     questions = db.scalars(
@@ -28,6 +29,7 @@ def get_questions(db: Session, stage_id: int, user_id: int | None = None) -> lis
 CHOICE_FIELDS = {1: "choice1", 2: "choice2", 3: "choice3", 4: "choice4"}
 
 
+# 답안 채점 및 시도 기록 저장. submission_id로 중복 제출을 idempotent하게 처리
 def submit_answer(
     db: Session,
     user_id: int,
@@ -96,6 +98,7 @@ def submit_answer(
     return _answer_payload(question, correct, attempt.attempt_id)
 
 
+# 채점 결과 응답(정오답/점수/해설/정답)을 조립
 def _answer_payload(question: Question, correct: bool, attempt_id: int) -> dict:
     return {
         "correct": correct,

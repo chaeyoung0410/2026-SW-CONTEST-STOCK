@@ -1,4 +1,6 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+from app.schemas.common import validate_login_id_format
 
 
 class LoginRequest(BaseModel):
@@ -14,8 +16,13 @@ class LoginResponse(BaseModel):
 
 
 class SignUpRequest(BaseModel):
-    login_id: str = Field(min_length=2, max_length=30, examples=["user01"])
+    login_id: str = Field(min_length=3, max_length=16, examples=["user01"])
     password: str = Field(min_length=4, max_length=100, examples=["1234"])
+
+    @field_validator("login_id")
+    @classmethod
+    def check_login_id_format(cls, value: str) -> str:
+        return validate_login_id_format(value)
 
 
 class SignUpResponse(BaseModel):

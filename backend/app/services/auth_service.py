@@ -6,6 +6,7 @@ from app.core.security import create_access_token, hash_password, verify_passwor
 from app.models.user import User
 
 
+# 회원가입: 아이디 중복 확인 후 비밀번호를 해시해 저장
 def sign_up(db: Session, login_id: str, password: str) -> User:
     if get_user_by_login_id(db, login_id) is not None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Login ID already exists")
@@ -20,6 +21,7 @@ def sign_up(db: Session, login_id: str, password: str) -> User:
     return user
 
 
+# 로그인: 아이디/비밀번호 검증 후 JWT 액세스 토큰 발급
 def login(db: Session, login_id: str, password: str) -> tuple[User, str]:
     user = get_user_by_login_id(db, login_id)
     if user is None or not verify_password(password, user.password):

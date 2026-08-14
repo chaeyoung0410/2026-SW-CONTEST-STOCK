@@ -25,6 +25,7 @@ app.add_middleware(
 )
 
 
+# 서버 시작 시 DB 테이블 생성 + 초기 데이터/기본 유저 시딩
 @app.on_event("startup")
 def on_startup() -> None:
     init_db()
@@ -36,6 +37,7 @@ def on_startup() -> None:
         db.close()
 
 
+# 기능별 라우터 등록
 app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(stage.router)
@@ -46,20 +48,24 @@ app.include_router(building.router)
 app.include_router(history.router)
 app.include_router(news.router)
 
+# 프런트엔드 정적 파일(이미지/CSS/JS, HTML 페이지) 서빙
 app.mount("/assets", StaticFiles(directory=FRONTEND_DIR / "assets"), name="frontend-assets")
 app.mount("/pages", StaticFiles(directory=PAGES_DIR, html=True), name="frontend-pages")
 
 
+# 루트 접속 시 시작 페이지로 리다이렉트
 @app.get("/")
 def landing_page() -> RedirectResponse:
     return RedirectResponse(url="/pages/index.html")
 
 
+# 로그인 페이지로 리다이렉트
 @app.get("/login")
 def login_page() -> RedirectResponse:
     return RedirectResponse(url="/pages/Login.html")
 
 
+# 서버 동작 확인용 헬스체크
 @app.get("/health")
 def health_check() -> dict[str, str]:
     return {"status": "ok", "service": "Project2026 Backend"}

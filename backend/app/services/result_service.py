@@ -14,6 +14,7 @@ from app.services.building_service import get_building_state
 from app.services.stage_service import ensure_stage_access
 
 
+# 422 Unprocessable Entity 예외를 만드는 헬퍼
 def _unprocessable(detail: str) -> HTTPException:
     return HTTPException(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -21,6 +22,7 @@ def _unprocessable(detail: str) -> HTTPException:
     )
 
 
+# submission_id로 이미 저장된 결과가 있는지 조회 (중복 제출 방지용)
 def _find_result_by_submission(
     db: Session, user_id: int, submission_id: str | None
 ) -> Result | None:
@@ -34,6 +36,7 @@ def _find_result_by_submission(
     )
 
 
+# 같은 submission_id로 재요청됐을 때, 내용이 같으면 기존 결과를 그대로 응답
 def _idempotent_result_response(
     db: Session,
     existing: Result,
@@ -57,6 +60,8 @@ def _idempotent_result_response(
     return {"stage_clear": True, "building_level": building_state["level"]}
 
 
+# 스테이지 결과 저장: 입력값 검증 → 제출된 답안 시도와 서버 기록 대조 →
+# Result/History/Progress 갱신까지 한 트랜잭션으로 처리
 def save_result(
     db: Session,
     user_id: int,

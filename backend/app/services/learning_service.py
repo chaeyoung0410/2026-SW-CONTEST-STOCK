@@ -5,6 +5,7 @@ from app.models.learning import Learning
 from app.services.stage_service import ensure_stage_access
 
 
+# 스테이지 접근 권한 확인 후 해당 스테이지의 개념 설명 페이지들을 합쳐서 반환
 def get_learning(db: Session, stage_id: int, user_id: int | None = None) -> dict:
     stage = ensure_stage_access(db, stage_id, user_id)
     pages = list(

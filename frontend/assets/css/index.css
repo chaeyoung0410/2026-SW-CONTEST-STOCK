@@ -12,6 +12,10 @@
     display: flex;
 }
 
+.index_main a{
+    text-decoration: none;
+}
+
 .index_m_box{
     width: 474px;
     height: 197px;

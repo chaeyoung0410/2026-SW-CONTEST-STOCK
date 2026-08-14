@@ -10,6 +10,7 @@ from app.services.result_service import save_result
 router = APIRouter(tags=["Result"])
 
 
+# 스테이지 클리어 결과 저장 (점수/정답 수/추천 콘텐츠 완료 여부 반영)
 @router.post("/result", response_model=ResultResponse)
 def save_stage_result(
     request: ResultRequest,

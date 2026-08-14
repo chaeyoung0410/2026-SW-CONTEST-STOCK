@@ -27,6 +27,7 @@ from app.services.recommendation_quiz_service import (
 router = APIRouter(tags=["Learning"])
 
 
+# AI 추천 학습 콘텐츠 목록 조회
 @router.get("/learning/recommend", response_model=list[RecommendationResponse])
 def get_recommended_learning(
     db: Session = Depends(get_db),
@@ -36,6 +37,7 @@ def get_recommended_learning(
     return get_recommendations(db, current_user.user_id, limit=limit)
 
 
+# 추천 콘텐츠 기반 Gemini 복습 퀴즈 생성
 @router.post(
     "/learning/recommendations/{recommendation_id}/quiz",
     response_model=RecommendationQuizResponse,
@@ -48,6 +50,7 @@ def generate_recommendation_quiz_questions(
     return generate_quiz_for_recommendation(db, current_user.user_id, recommendation_id)
 
 
+# 추천 퀴즈 채점 결과 제출
 @router.post(
     "/learning/recommendations/{recommendation_id}/quiz/complete",
     response_model=RecommendationQuizCompletionResponse,
@@ -67,6 +70,7 @@ def submit_recommendation_quiz_result(
     )
 
 
+# 클릭/학습 시작 등 추천 콘텐츠 상호작용 기록 공통 처리
 def _record_interaction(
     interaction: str,
     recommendation_id: int,
@@ -93,6 +97,7 @@ def _record_interaction(
     }
 
 
+# 추천 콘텐츠 클릭 기록
 @router.post(
     "/learning/recommendations/{recommendation_id}/click",
     response_model=RecommendationInteractionResponse,
@@ -105,6 +110,7 @@ def click_recommendation(
     return _record_interaction("click", recommendation_id, db, current_user)
 
 
+# 추천 콘텐츠 학습 시작 기록
 @router.post(
     "/learning/recommendations/{recommendation_id}/start",
     response_model=RecommendationInteractionResponse,
@@ -117,6 +123,7 @@ def start_recommendation(
     return _record_interaction("start", recommendation_id, db, current_user)
 
 
+# 특정 스테이지의 학습(개념 설명) 콘텐츠 조회
 @router.get("/learning/{stage_id}", response_model=LearningResponse)
 def get_learning_content(
     stage_id: int,

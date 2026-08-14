@@ -18,6 +18,7 @@ engine = create_engine(
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 
+# FastAPI 의존성: 요청마다 DB 세션을 생성하고 끝나면 반드시 닫는다
 def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:

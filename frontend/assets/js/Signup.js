@@ -8,6 +8,30 @@ const passwordConfirmToggle = document.getElementById("passwordConfirmToggle");
 const passwordEye = document.getElementById("passwordEye");
 const passwordConfirmEye = document.getElementById("passwordConfirmEye");
 const signupError = document.getElementById("signupError");
+const userIdMessage = document.getElementById("userIdMessage");
+
+// 아이디 형식: 영문(대소문자) + 숫자, 3~16자, 영문 최소 1자 포함
+const LOGIN_ID_PATTERN = /^(?=.*[A-Za-z])[A-Za-z0-9]{3,16}$/;
+const LOGIN_ID_FORMAT_MESSAGE = "아이디는 영문, 숫자로 3~16자 입력해주세요. (영문 최소 1자 포함)";
+
+/* 아이디 입력: 영문/숫자 외 문자는 즉시 제거하고, 형식에 맞는지 실시간으로 안내 */
+userIdInput.addEventListener("input", () => {
+    const filtered = userIdInput.value.replace(/[^A-Za-z0-9]/g, "");
+    if (filtered !== userIdInput.value) {
+        userIdInput.value = filtered;
+    }
+
+    if (!userIdInput.value) {
+        userIdMessage.textContent = "영문, 숫자 3~16자 (영문 최소 1자 포함)";
+        userIdMessage.classList.remove("success", "error");
+        return;
+    }
+
+    const valid = LOGIN_ID_PATTERN.test(userIdInput.value);
+    userIdMessage.textContent = valid ? "사용 가능한 형식이에요." : LOGIN_ID_FORMAT_MESSAGE;
+    userIdMessage.classList.toggle("success", valid);
+    userIdMessage.classList.toggle("error", !valid);
+});
 
 
 /* 비밀번호 보기/숨기기 */
@@ -57,6 +81,12 @@ signupButton.addEventListener("click", async () => {
 
     if (!login_id || !password || !passwordConfirm) {
         signupError.textContent = "모든 항목을 입력해주세요.";
+        signupError.style.display = "block";
+        return;
+    }
+
+    if (!LOGIN_ID_PATTERN.test(login_id)) {
+        signupError.textContent = LOGIN_ID_FORMAT_MESSAGE;
         signupError.style.display = "block";
         return;
     }

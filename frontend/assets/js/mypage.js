@@ -7,6 +7,10 @@ const newIdInput = document.getElementById('newIdInput');
 const charCount = document.getElementById('charCount');
 const userId = document.getElementById('userId');
 
+// 아이디 형식: 영문(대소문자) + 숫자, 3~16자, 영문 최소 1자 포함
+const LOGIN_ID_PATTERN = /^(?=.*[A-Za-z])[A-Za-z0-9]{3,16}$/;
+const LOGIN_ID_FORMAT_MESSAGE = '아이디는 영문, 숫자로 3~16자 입력해주세요. (영문 최소 1자 포함)';
+
 // 로그인한 사용자 정보 불러오기
 async function loadProfile() {
   const token = localStorage.getItem('accessToken');
@@ -109,13 +113,18 @@ editIdModal.addEventListener('click', (e) => {
 });
 
 newIdInput.addEventListener('input', () => {
+  // 영문, 숫자 외 문자는 입력 즉시 제거
+  const filtered = newIdInput.value.replace(/[^A-Za-z0-9]/g, '');
+  if (filtered !== newIdInput.value) {
+    newIdInput.value = filtered;
+  }
   charCount.textContent = `${newIdInput.value.length} / 16`;
 });
 
 modalConfirmBtn.addEventListener('click', async () => {
   const value = newIdInput.value.trim();
-  if (value.length < 2) {
-    alert('아이디는 2자 이상 입력해주세요.');
+  if (!LOGIN_ID_PATTERN.test(value)) {
+    alert(LOGIN_ID_FORMAT_MESSAGE);
     return;
   }
 
