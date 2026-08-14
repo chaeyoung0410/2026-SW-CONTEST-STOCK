@@ -205,5 +205,5 @@ python -m uvicorn app.main:app --reload
 | --- | -------- | ------------------- |
 | 김민진 | Frontend | AI 추천 학습 및 마이페이지 화면 구현  |
 | 김서윤 | Frontend | 온보딩 및 게임 플레이 화면 구현  |
-| 김한슬 | Backend  | 담당 API 및 기능을 입력해주세요 |
-| 박채영 | Backend  | 담당 API 및 기능을 입력해주세요 |
+| 김한슬 | Backend  | 사용자 인증 및 학습 이력 DB 구축, API 개발 |
+| 박채영 | Backend  | AI 학습 추천·사용자 마이페이지 및 게임 진행도 조회 기능 개발 |
