@@ -67,7 +67,7 @@ AI 맞춤 문제 생성
 
 ## 프로젝트 구조
 
-```text
+``` text
 2026-SW-CONTEST-STOCK/
 ├── backend/                # FastAPI 서버
 │   ├── app/
