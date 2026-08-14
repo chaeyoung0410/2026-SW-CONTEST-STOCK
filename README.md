@@ -67,48 +67,23 @@ AI 맞춤 문제 생성
 
 ## 프로젝트 구조
 
-├── backend/                        FastAPI 서버 (Python)
+```text
+2026-SW-CONTEST-STOCK/
+├── backend/                # FastAPI 서버
 │   ├── app/
-│   │   ├── main.py                 앱 진입점 (라우터 등록, 정적 파일 서빙, 시작 시 DB 시딩)
-│   │   ├── core/
-│   │   │   ├── config.py           환경설정 (DB URL, JWT secret, Gemini API 설정)
-│   │   │   └── security.py         비밀번호 해시, JWT 처리
-│   │   ├── db/
-│   │   │   ├── session.py          SQLAlchemy 엔진/세션
-│   │   │   ├── init_db.py          테이블 생성
-│   │   │   └── seed_data.py        스테이지 14개 + 문제 70개, 기본 유저(kim) 시드
-│   │   ├── models/                 SQLAlchemy ORM 모델
-│   │   │   ├── user, stage, question, progress, result, history
-│   │   │   ├── answer_attempt, wrong_answer
-│   │   │   └── recommendation_history, remedial_question_cache
-│   │   ├── schemas/                Pydantic 요청/응답 스키마
-│   │   │   ├── auth, user, common(아이디 형식 검증)
-│   │   │   ├── quiz, stage, result, history, building, news, statistics
-│   │   │   └── recommendation_quiz
-│   │   ├── crud/                   DB 직접 접근 헬퍼 (user.py)
-│   │   ├── services/                비즈니스 로직
-│   │   │   ├── auth_service, quiz_service, result_service, stage_service
-│   │   │   ├── building_service(건물 레벨), history_service, learning_service
-│   │   │   ├── recommend_service / recommendation_quiz_service / recommendation_scoring
-│   │   │   ├── gemini_service(AI 연동), news_service, statistics_service
-│   │   └── api/routes/              FastAPI 라우터 (엔드포인트)
-│   │       ├── auth, user, stage, quiz, result, learning
-│   │       ├── building, history, news, statistics
-│   ├── migrations/                  SQL 마이그레이션 (mysql/sqlite 쌍)
-│   ├── tests/                       pytest 테스트 (추천 퀴즈, 통계)
-│   ├── local.db                     로컬 SQLite DB (자동 생성)
-│   └── requirements.txt
-│
-├── frontend/                        정적 프론트엔드
-│   ├── pages/                       HTML 화면
-│   │   ├── index.html, Login.html, Signup.html
-│   │   ├── Gameplay.html(퀴즈/게임 진행), mypage.html, ai.html, final.html
-│   ├── assets/
-│   │   ├── js/                      화면별 스크립트 (Login, Signup, Gameplay, ai, ai_quiz, mypage, motion)
-│   │   ├── css/                     화면별 스타일 + motion.css(공통 애니메이션)
-│   │   └── img/                     캐릭터/아이콘 이미지
-│
-└── README.md / .gitignore
+│   │   ├── main.py         # 앱 진입점
+│   │   ├── core/           # 설정, 보안
+│   │   ├── db/              # DB 세션, 초기화, 시드 데이터
+│   │   ├── models/          # SQLAlchemy 모델
+│   │   ├── schemas/         # Pydantic 스키마
+│   │   ├── services/        # 비즈니스 로직
+│   │   └── api/routes/      # 엔드포인트
+│   ├── migrations/          # SQL 마이그레이션
+│   └── tests/                # pytest 테스트
+└── frontend/                 # 정적 프론트엔드
+    ├── pages/                 # HTML 화면
+    └── assets/                # js / css / img
+```
 
 
 ## 실행 방법
