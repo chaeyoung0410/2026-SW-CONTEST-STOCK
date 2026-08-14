@@ -13,16 +13,11 @@
 
   <div class="app-frame">
 
-    <!-- 뒤로가기 버튼 -->
     <button class="icon-btn back-btn" type="button" aria-label="뒤로가기">
       <img src="../assets/img/back.png" alt="" />
     </button>
     
-    <!--  오늘의 추천 (상단 카드)  -->
     <section class="today-card">
-      <!--
-        예) todayCard.querySelector('.card-content').innerHTML = ... 로 렌더링
-      -->
       <div class="card-content" data-slot="today-recommendation"></div>
 
       <button class="btn btn-primary" type="button" data-action="start-today">
@@ -30,8 +25,6 @@
       </button>
     </section>
 
-
-    <!-- 추천 학습 콘텐츠 (리스트 카드)  -->
     <section class="list-card">
 
       <div class="list-row">
